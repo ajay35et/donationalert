@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  <script src="https://sdk.cashfree.com/js/v3/cashfree.js"></script>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes, viewport-fit=cover">
   <title>StreamTip · Live + Tips</title>
@@ -865,65 +866,49 @@
   }
 
   async function doPay() {
-    const btn  = document.getElementById('pay-btn');
-    const txt  = document.getElementById('pay-txt');
-    const spin = document.getElementById('pay-spin');
+  const btn  = document.getElementById('pay-btn');
+  const txt  = document.getElementById('pay-txt');
+  const spin = document.getElementById('pay-spin');
 
-    btn.disabled = true;
-    txt.textContent = 'Processing…';
-    spin.style.display = 'block';
+  btn.disabled = true;
+  txt.textContent = 'Processing…';
+  spin.style.display = 'block';
 
-    const logs = [];
-    let success = false;
+  try {
+    // Step 1: Create order via Vercel API
+    const res = await fetch('/api/create-order', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        name:    state.name,
+        email:   state.email,
+        amount:  state.amount,
+        message: state.msg
+      })
+    });
 
-    try {
-      const res = await fetch(ENV.DONATION_ENDPOINT, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          name:    state.name,
-          email:   state.email,
-          amount:  state.amount,
-          message: state.msg
-        })
-      });
+    const data = await res.json();
 
-      const data = await res.json();
-
-      if (res.ok) {
-        logs.push({ t: 'ok',   m: '✓ Payment request accepted' });
-        logs.push({ t: 'info', m: '→ Triggering StreamElements alert…' });
-        logs.push({ t: 'ok',   m: '✓ Tip alert fired' });
-        success = true;
-
-        // If Cashfree returns a payment URL, open it
-        if (data.payment_link || data.paymentLink) {
-          window.open(data.payment_link || data.paymentLink, '_blank');
-          logs.push({ t: 'info', m: '→ Opened Cashfree checkout' });
-        }
-      } else {
-        logs.push({ t: 'err', m: `✗ Error ${res.status}: ${data.message || 'Payment failed'}` });
-      }
-    } catch (err) {
-      logs.push({ t: 'err', m: `✗ Network error: ${err.message}` });
+    if (!res.ok) {
+      alert('Error: ' + (data.error || 'Payment failed'));
+      return;
     }
 
+    // Step 2: Open Cashfree checkout
+    const cashfree = Cashfree({ mode: 'production' }); // change to 'sandbox' for testing
+    cashfree.checkout({
+      paymentSessionId: data.payment_session_id,
+      returnUrl: window.location.origin + '/thankyou?order_id=' + data.order_id,
+    });
+
+  } catch (err) {
+    alert('Network error: ' + err.message);
+  } finally {
     spin.style.display = 'none';
     btn.disabled = false;
     txt.textContent = 'Pay Now';
-
-    document.getElementById('log-mini').innerHTML = logs.map(l =>
-      `<div style="color:${l.t === 'ok' ? '#22d382' : l.t === 'err' ? '#ff6060' : '#9b94ff'}">${l.m}</div>`
-    ).join('');
-
-    if (success) {
-      showBanner(state.name, state.amount);
-      tipHistory.unshift({ name: state.name, amount: state.amount, ts: Date.now() });
-      renderHistory();
-      addTopTip(state.name, state.amount);
-      goStep(4);
-    }
   }
+}
 
   function showBanner(name, amt) {
     document.getElementById('tip-av').innerText   = name.slice(0, 2).toUpperCase();
