@@ -7,46 +7,61 @@ export default async function handler(req, res) {
     return res.status(400).json({ error: 'Missing required fields' });
   }
 
-  // Step 1: Create Cashfree order
   const orderId = 'tip-' + Date.now();
 
-  const cfRes = await fetch('https://sandbox.cashfree.com/pg/orders', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'x-api-version': '2023-08-01',
-      'x-client-id':     process.env.CASHFREE_APP_ID,
-      'x-client-secret': process.env.CASHFREE_SECRET_KEY,
-    },
-    body: JSON.stringify({
-      order_id: orderId,
-      order_amount: amount,
-      order_currency: 'INR',
-      customer_details: {
-        customer_id:    'cust-' + Date.now(),
-        customer_name:  name,
-        customer_email: email,
-        customer_phone: '9999999999',  // required by Cashfree, can make this a form field too
-      },
-      order_meta: {
-        notify_url: process.env.WEBHOOK_URL,  // your Supabase edge function
-        return_url: process.env.RETURN_URL + '?order_id=' + orderId,
-      },
-      order_tags: {
-        message: message || '',
-      }
-    })
-  });
+  // Auto-detect base URL from request
+  const origin = req.headers.origin || req.headers.host;
+  const baseUrl = origin.startsWith('http') ? origin : 'https://' + origin;
 
-  const order = await cfRes.json();
+  try {
+    const cfRes = await fetch('https://sandbox.cashfree.com/pg/orders', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-version': '2023-08-01',
+        'x-client-id':     process.env.CASHFREE_APP_ID,
+        'x-client-secret': process.env.CASHFREE_SECRET_KEY,
+      },
+      body: JSON.stringify({
+        order_id: orderId,
+        order_amount: amount,
+        order_currency: 'INR',
+        customer_details: {
+          customer_id:    'cust-' + Date.now(),
+          customer_name:  name,
+          customer_email: email,
+          customer_phone: '9999999999',
+        },
+        order_meta: {
+          notify_url: process.env.WEBHOOK_URL,
+          return_url: `${baseUrl}/thankyou?order_id=${orderId}`,
+        },
+        order_tags: {
+          message: message || '',
+        }
+      })
+    });
 
-  if (!cfRes.ok) {
-    console.error('Cashfree error:', order);
-    return res.status(500).json({ error: 'Failed to create order', details: order });
+    const order = await cfRes.json();
+
+    console.log('CF Status:', cfRes.status);
+    console.log('CF Response:', JSON.stringify(order));
+
+    if (!cfRes.ok) {
+      return res.status(500).json({
+        error: 'Failed to create order',
+        cf_status: cfRes.status,
+        cf_response: order
+      });
+    }
+
+    return res.status(200).json({
+      order_id: order.order_id,
+      payment_session_id: order.payment_session_id,
+    });
+
+  } catch (err) {
+    console.error('Exception:', err.message);
+    return res.status(500).json({ error: 'Server error', details: err.message });
   }
-
-  return res.status(200).json({
-    order_id: order.order_id,
-    payment_session_id: order.payment_session_id,
-  });
 }
