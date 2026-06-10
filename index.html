@@ -865,7 +865,7 @@
     }
   }
 
-  async function doPay() {
+ async function doPay() {
   const btn  = document.getElementById('pay-btn');
   const txt  = document.getElementById('pay-txt');
   const spin = document.getElementById('pay-spin');
@@ -875,7 +875,7 @@
   spin.style.display = 'block';
 
   try {
-    // Step 1: Create order via Vercel API
+    // Step 1: Create order
     const res = await fetch('/api/create-order', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -888,28 +888,29 @@
     });
 
     const data = await res.json();
+    console.log('Order response:', data); // ← check this in browser console
 
-    if (!res.ok) {
-      alert('Error: ' + (data.error || 'Payment failed'));
+    if (!res.ok || !data.payment_session_id) {
+      alert('Error: ' + (data.error || data.cf_response?.message || 'No session ID returned'));
       return;
     }
 
     // Step 2: Open Cashfree checkout
-    const cashfree = Cashfree({ mode: 'production' }); // change to 'sandbox' for testing
-    cashfree.checkout({
-      paymentSessionId: data.payment_session_id,
+    const cashfree = Cashfree({ mode: 'sandbox' }); // ✅ must match your keys
+    await cashfree.checkout({
+      paymentSessionId: data.payment_session_id,  // ✅ exact field name
       returnUrl: window.location.origin + '/thankyou?order_id=' + data.order_id,
     });
 
   } catch (err) {
-    alert('Network error: ' + err.message);
+    console.error(err);
+    alert('Error: ' + err.message);
   } finally {
     spin.style.display = 'none';
     btn.disabled = false;
     txt.textContent = 'Pay Now';
   }
 }
-
   function showBanner(name, amt) {
     document.getElementById('tip-av').innerText   = name.slice(0, 2).toUpperCase();
     document.getElementById('tip-name').innerText = name;
