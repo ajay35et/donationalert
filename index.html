@@ -728,7 +728,7 @@
   const ENV = {
     DEFAULT_YOUTUBE_URL: 'https://www.youtube.com/watch?v=WWMYmxo45AM',
     SE_CHAT_URL: '',  // Set your StreamElements overlay URL here — hidden from UI
-    DONATION_ENDPOINT: 'https://nwuxxchnrqykkahraqkn.supabase.co/functions/v1/donation'
+    DONATION_ENDPOINT: 'https://bvavtdyxuzzabzgodbjw.supabase.co/functions/v1/donation'
   };
 
   // ==========================================
@@ -865,7 +865,7 @@
     }
   }
 
- async function doPay() {
+  async function doPay() {
   const btn  = document.getElementById('pay-btn');
   const txt  = document.getElementById('pay-txt');
   const spin = document.getElementById('pay-spin');
@@ -911,6 +911,7 @@
     txt.textContent = 'Pay Now';
   }
 }
+
   function showBanner(name, amt) {
     document.getElementById('tip-av').innerText   = name.slice(0, 2).toUpperCase();
     document.getElementById('tip-name').innerText = name;
