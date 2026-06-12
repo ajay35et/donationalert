@@ -1,108 +1,276 @@
 ```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Terms & Conditions</title>
+
 <style>
-body{
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
     font-family:Arial,sans-serif;
+}
+
+body{
     background:#0f172a;
     color:#e2e8f0;
-    margin:0;
     padding:20px;
 }
 
 .container{
-    max-width:900px;
-    margin:40px auto;
-    background:#1e293b;
-    padding:35px;
-    border-radius:20px;
-    box-shadow:0 10px 30px rgba(0,0,0,.3);
+    max-width:1000px;
+    margin:auto;
 }
 
-h1{
+.header{
     text-align:center;
-    color:#fff;
-    margin-bottom:10px;
+    margin-bottom:30px;
 }
 
-h2{
-    color:#60a5fa;
-    margin-top:30px;
+.header h1{
+    color:#fff;
+    font-size:42px;
     margin-bottom:10px;
 }
 
 .last-updated{
-    text-align:center;
     color:#94a3b8;
-    margin-bottom:30px;
 }
 
-p{
+.card{
+    background:#1e293b;
+    padding:25px;
+    border-radius:18px;
+    margin-bottom:20px;
+    box-shadow:0 8px 25px rgba(0,0,0,.25);
+}
+
+.card h2{
+    color:#60a5fa;
+    margin-bottom:12px;
+    font-size:22px;
+}
+
+.card p{
     line-height:1.8;
 }
 
-ul{
-    padding-left:22px;
+.card ul{
+    margin-top:10px;
+    padding-left:20px;
 }
 
-li{
-    margin-bottom:10px;
+.card li{
+    margin-bottom:8px;
 }
 
 .contact-box{
-    margin-top:30px;
-    background:#334155;
-    padding:20px;
-    border-radius:12px;
+    background:linear-gradient(135deg,#2563eb,#7c3aed);
+    padding:25px;
+    border-radius:18px;
+    margin-top:25px;
+}
+
+.contact-box h2{
+    color:white;
+    margin-bottom:15px;
 }
 
 .contact-box a{
-    color:#60a5fa;
+    color:white;
     text-decoration:none;
+    font-weight:bold;
 }
 
-.contact-box a:hover{
-    text-decoration:underline;
+.contact-box p{
+    line-height:2;
 }
 
 @media(max-width:768px){
 
-    .container{
-        padding:20px;
+    .header h1{
+        font-size:30px;
     }
 
-    h1{
-        font-size:28px;
+    .card{
+        padding:18px;
     }
 
 }
 </style>
+</head>
+
+<body>
 
 <div class="container">
 
-<!-- YAHAN SE TERA PURA EXISTING CONTENT START HOGA -->
+    <div class="header">
+        <h1>📜 Terms & Conditions</h1>
+        <p class="last-updated">Last Updated: June 2026</p>
+    </div>
 
-<h1>Terms & Conditions</h1>
-<p class="last-updated">Last Updated: June 2026</p>
+    <div class="card">
+        <p>
+            Welcome to StreamTip. By accessing or using this website, you agree to comply with and be bound by the following Terms & Conditions. If you do not agree with any part of these terms, please discontinue use of the platform.
+        </p>
+    </div>
 
-<!-- Tera baaki sara content same rahega -->
+    <div class="card">
+        <h2>1. Platform Purpose</h2>
+        <p>
+            StreamTip is an online donation platform that allows viewers to voluntarily support streamers, content creators, and broadcasters through monetary contributions.
+        </p>
+        <p>
+            The platform facilitates payment processing and donation delivery but does not act as the recipient of donated funds unless explicitly stated.
+        </p>
+    </div>
 
-<div class="contact-box">
+    <div class="card">
+        <h2>2. Eligibility</h2>
+        <p>
+            To use this platform, you must be at least 18 years of age or have permission from a parent or legal guardian.
+        </p>
+    </div>
 
-<h2>📩 Contact Information</h2>
+    <div class="card">
+        <h2>3. Donations</h2>
+        <p>
+            All donations made through StreamTip are voluntary.
+        </p>
 
-<p>
-Email:
-<a href="mailto:workajaygamer@gmail.com?subject=Donation%20Support">
-workajaygamer@gmail.com
-</a>
-<br><br>
+        <ul>
+            <li>You are donating willingly.</li>
+            <li>You are authorized to use the selected payment method.</li>
+            <li>You understand that donations are generally non-refundable.</li>
+            <li>You are not purchasing any physical product unless explicitly stated otherwise.</li>
+        </ul>
+    </div>
 
-Phone:
-<a href="tel:+91XXXXXXXXXX">
-+91XXXXXXXXXX
-</a>
-</p>
+    <div class="card">
+        <h2>4. Payment Processing</h2>
+
+        <p>
+            Payments are securely processed through authorized payment partners, including Cashfree and other supported payment providers.
+        </p>
+
+        <p>
+            We do not store complete payment card information or banking credentials on our servers.
+        </p>
+
+        <p>
+            All transactions are subject to verification, approval, and fraud screening by the payment processor.
+        </p>
+    </div>
+
+    <div class="card">
+        <h2>5. Refund Policy</h2>
+
+        <p>
+            Donations are generally final and non-refundable once successfully processed.
+        </p>
+
+        <ul>
+            <li>Duplicate transactions</li>
+            <li>Technical payment failures</li>
+            <li>Unauthorized transactions verified through investigation</li>
+            <li>Situations required by applicable law</li>
+        </ul>
+    </div>
+
+    <div class="card">
+        <h2>6. User Conduct</h2>
+
+        <ul>
+            <li>Submit fraudulent payments</li>
+            <li>Abuse chargeback systems</li>
+            <li>Attempt unauthorized access to the platform</li>
+            <li>Upload malicious content</li>
+            <li>Harass, threaten, or abuse creators or other users</li>
+            <li>Use the platform for illegal activities</li>
+        </ul>
+
+        <p>
+            Violation of these terms may result in suspension or permanent restriction of access.
+        </p>
+    </div>
+
+    <div class="card">
+        <h2>7. Content Responsibility</h2>
+
+        <p>
+            Content displayed during live streams, broadcasts, videos, or creator activities is the sole responsibility of the respective creator.
+        </p>
+
+        <p>
+            StreamTip does not guarantee, endorse, or assume responsibility for any creator-generated content.
+        </p>
+    </div>
+
+    <div class="card">
+        <h2>8. Limitation of Liability</h2>
+
+        <p>
+            To the maximum extent permitted by law, StreamTip shall not be liable for indirect damages, consequential damages, lost profits, service interruptions, creator actions, or donation disputes.
+        </p>
+    </div>
+
+    <div class="card">
+        <h2>9. Service Availability</h2>
+
+        <p>
+            While we strive to provide uninterrupted service, we do not guarantee continuous availability of the platform.
+        </p>
+
+        <p>
+            Maintenance, updates, technical failures, or third-party service outages may affect platform functionality.
+        </p>
+    </div>
+
+    <div class="card">
+        <h2>10. Privacy</h2>
+
+        <p>
+            Your use of StreamTip is also governed by our Privacy Policy.
+        </p>
+    </div>
+
+    <div class="card">
+        <h2>11. Changes to Terms</h2>
+
+        <p>
+            We reserve the right to modify these Terms & Conditions at any time.
+        </p>
+
+        <p>
+            Continued use of the platform after updates constitutes acceptance of the revised terms.
+        </p>
+    </div>
+
+    <div class="contact-box">
+
+        <h2>📩 Contact Information</h2>
+
+        <p>
+            📧
+            <a href="mailto:workajaygamer@gmail.com?subject=Donation%20Support">
+                workajaygamer@gmail.com
+            </a>
+        </p>
+
+        <p>
+            📱
+            <a href="tel:+91XXXXXXXXXX">
+                +91XXXXXXXXXX
+            </a>
+        </p>
+
+    </div>
 
 </div>
 
-</div>
+</body>
+</html>
 ```
