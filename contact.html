@@ -1,42 +1,56 @@
-<div class="container">
-    <h1>Contact Us</h1>
+```html
+<div class="contact-form">
+    <h3>💬 Send Us a Message</h3>
 
-    <p>
-        We'd love to hear from you. If you have any questions, suggestions,
-        or need assistance regarding donations or stream alerts, feel free to contact us.
-    </p>
+    <form action="mailto:workajaygamer@gmail.com" method="post" enctype="text/plain">
 
-    <div class="contact-info">
-        <h3>📩 Contact Information</h3>
+        <input
+            type="text"
+            name="Name"
+            placeholder="Your Name"
+            required
+            style="width:100%;padding:12px;margin-bottom:12px;border:1px solid #ddd;border-radius:8px;"
+        >
 
-        <p>
-            <strong>Email:</strong>
-            <a href="mailto:workajaygamer@gmail.com?subject=Donation%20Support&body=Hello%20Ajay,%0A%0AI%20need%20help%20regarding%20my%20donation.">
-                workajaygamer@gmail.com
-            </a>
-        </p>
+        <input
+            type="email"
+            name="Email"
+            placeholder="Your Email"
+            required
+            style="width:100%;padding:12px;margin-bottom:12px;border:1px solid #ddd;border-radius:8px;"
+        >
 
-        <p>
-            <strong>Phone:</strong>
-            <a href="tel:+91XXXXXXXXXX">
-                +91XXXXXXXXXX
-            </a>
-        </p>
-    </div>
+        <div style="position:relative;">
 
-    <div class="contact-form">
-        <h3>💬 Send Us a Message</h3>
+            <textarea
+                name="Message"
+                rows="6"
+                placeholder="Type your message..."
+                required
+                style="width:100%;padding:12px 55px 12px 12px;border:1px solid #ddd;border-radius:12px;resize:none;box-sizing:border-box;"
+            ></textarea>
 
-        <form action="mailto:workajaygamer@gmail.com" method="post" enctype="text/plain">
+            <button
+                type="submit"
+                style="
+                    position:absolute;
+                    bottom:12px;
+                    right:12px;
+                    width:40px;
+                    height:40px;
+                    border:none;
+                    border-radius:50%;
+                    background:#007bff;
+                    color:white;
+                    font-size:18px;
+                    cursor:pointer;
+                "
+            >
+                ➤
+            </button>
 
-            <input type="text" name="Name" placeholder="Your Name" required>
+        </div>
 
-            <input type="email" name="Email" placeholder="Your Email" required>
-
-            <textarea name="Message" rows="5" placeholder="Your Message" required></textarea>
-
-            <button type="submit">Send Message</button>
-
-        </form>
-    </div>
+    </form>
 </div>
+```
