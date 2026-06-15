@@ -445,13 +445,13 @@
     }
     .se-iframe-wrap iframe {
       position: absolute;
-      top: 0;
-      left: 0;
+      top: 0; left: 0;
       width: 100%;
       height: 100%;
       border: none;
       display: block;
-      transform: none !important;
+      /* scale-down ensures content fits without horizontal scroll */
+      transform-origin: top left;
     }
 
     /* StreamElements overlay placeholder when no URL is set */
@@ -515,10 +515,13 @@
     <!-- LEFT: Stream + Tip form -->
     <div class="left-panel">
       <div class="yt-wrapper" id="ytWrapper">
-        <iframe id="seChatIframe"
-        src="https://streamelements.com/overlay/6a29a84a69c8546152ccad58/-qcWuOdQ9Qcjvxee-6ANnk83a-lGGB15DG5Iu25YMCCz39jO"
-        title="StreamElements Chat Overlay"
-        style="width:100%;height:100%;border:none;">
+        <iframe id="youtubeStream"
+                src="about:blank"
+                title="YouTube Live Stream"
+                frameborder="0"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                referrerpolicy="strict-origin-when-cross-origin"
+                allowfullscreen>
         </iframe>
         <div class="yt-fallback" id="ytFallback">
           <div class="yt-fallback-icon"><i class="ti ti-player-play-filled"></i></div>
@@ -686,10 +689,37 @@
   // ==========================================
   // SE CHAT — auto-fit scaling
   // ==========================================
- function initSEChat() {
-  const iframe = document.getElementById('seChatIframe');
-  iframe.src = SE_URL;
+  function initSEChat() {
+    const iframe = document.getElementById('seChatIframe');
+    const wrap   = document.getElementById('seChatWrap');
+
+    iframe.src = SE_URL;
+
+    // Auto-fit: scale iframe content to fill the container without scrollbars.
+    // StreamElements overlays are typically 1920×1080 or similar fixed dimensions;
+    // we scale them down to fit the 340px sidebar width proportionally.
+    function fitChat() {
+      const W = wrap.offsetWidth;
+      const H = wrap.offsetHeight;
+      if (!W || !H) return;
+
+      // The overlay's native design width — SE overlays are usually 1920px wide
+      const NATIVE_W = 1920;
+      const scale    = W / NATIVE_W;
+
+      iframe.style.width     = NATIVE_W + 'px';
+      iframe.style.height    = Math.round(H / scale) + 'px';
+      iframe.style.transform = `scale(${scale})`;
+      iframe.style.transformOrigin = 'top left';
+    }
+
+    fitChat();
+    window.addEventListener('resize', fitChat);
+
+    // Re-fit after iframe loads in case content changes layout
+    iframe.addEventListener('load', () => setTimeout(fitChat, 200));
   }
+
   // ==========================================
   // YOUTUBE
   // ==========================================
