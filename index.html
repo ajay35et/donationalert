@@ -4,7 +4,7 @@
   <script src="https://sdk.cashfree.com/js/v3/cashfree.js"></script>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes, viewport-fit=cover">
-  <title>StreamTip · Live + Tips</title>
+  <title>StreamTip Â· Live + Tips</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Syne:wght@600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.5.0/dist/tabler-icons.min.css">
@@ -39,7 +39,6 @@
       color: var(--text);
     }
 
-    /* ===== CONTAINER ===== */
     .app {
       max-width: 1440px;
       margin: 0 auto;
@@ -50,7 +49,6 @@
       box-shadow: 0 32px 64px rgba(0,0,0,.8), 0 0 0 1px rgba(108,99,255,.12);
     }
 
-    /* ===== TOPBAR ===== */
     .topbar {
       display: flex;
       align-items: center;
@@ -62,11 +60,7 @@
       gap: 8px;
     }
 
-    .logo {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
+    .logo { display: flex; align-items: center; gap: 10px; }
     .logo-mark {
       width: 34px; height: 34px;
       background: linear-gradient(135deg, #ff3030, #cc0000);
@@ -112,7 +106,6 @@
     }
     .viewer-pill i { font-size: 13px; color: var(--accent); }
 
-    /* ===== LAYOUT ===== */
     .main-layout {
       display: grid;
       grid-template-columns: 1fr 340px;
@@ -132,7 +125,6 @@
       min-width: 0;
     }
 
-    /* ===== YOUTUBE EMBED ===== */
     .yt-wrapper {
       position: relative;
       width: 100%;
@@ -145,7 +137,6 @@
       border: none; display: block;
     }
 
-    /* Error / fallback overlay */
     .yt-fallback {
       position: absolute; inset: 0;
       display: none;
@@ -183,7 +174,6 @@
       text-align: left; line-height: 1.8;
     }
 
-    /* ===== URL CONFIG BAR ===== */
     .url-bar {
       display: flex; align-items: center; gap: 8px;
       padding: 8px 14px;
@@ -200,8 +190,7 @@
       padding: 7px 12px;
       color: var(--text); font-size: 11px;
       font-family: var(--font-mono);
-      outline: none;
-      transition: .15s;
+      outline: none; transition: .15s;
     }
     .url-bar input:focus { border-color: var(--accent); box-shadow: 0 0 0 2px rgba(108,99,255,.15); }
     .url-bar .load-btn {
@@ -215,7 +204,6 @@
     }
     .url-bar .load-btn:hover { background: var(--accent2); }
 
-    /* ===== TIP BANNER ===== */
     .tip-banner {
       display: none;
       align-items: center; gap: 10px;
@@ -248,7 +236,6 @@
       padding: 4px 12px; border-radius: 999px;
     }
 
-    /* ===== PAYMENT PANEL ===== */
     .payment-panel {
       flex: 1; padding: 16px;
       overflow-y: auto;
@@ -273,11 +260,7 @@
       box-shadow: 0 1px 4px rgba(0,0,0,.4);
     }
 
-    /* Steps */
-    .step-row {
-      display: flex; align-items: center; gap: 6px;
-      margin-bottom: 18px;
-    }
+    .step-row { display: flex; align-items: center; gap: 6px; margin-bottom: 18px; }
     .sp {
       width: 26px; height: 26px; border-radius: 50%;
       background: var(--surface3); border: 1px solid var(--border2);
@@ -294,7 +277,6 @@
     .step-panel.vis { display: block; animation: fadeIn .2s ease; }
     @keyframes fadeIn { from {opacity:0; transform:translateY(6px)} to {opacity:1; transform:none} }
 
-    /* Form fields */
     .fld { margin-bottom: 12px; }
     .fld-label {
       font-size: 10px; font-weight: 700; text-transform: uppercase;
@@ -316,7 +298,6 @@
     }
     .fld input::placeholder { color: var(--text3); }
 
-    /* Amount chips */
     .amt-grid {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
@@ -339,7 +320,6 @@
       color: var(--accent3);
     }
 
-    /* Buttons */
     .btn {
       width: 100%;
       border: none; border-radius: 10px;
@@ -364,7 +344,6 @@
     }
     .btn-ghost:hover { border-color: var(--text3); color: var(--text2); }
 
-    /* Review box */
     .review-box {
       background: var(--surface3);
       border: 1px solid var(--border2);
@@ -379,7 +358,6 @@
     .rv-row span:first-child { color: var(--text3); }
     .rv-row span:last-child { color: var(--text); font-weight: 600; }
 
-    /* Pay gate */
     .pay-gate {
       background: var(--surface3);
       border: 1px solid var(--border2);
@@ -388,9 +366,7 @@
     }
     .pay-title { font-family: var(--font-head); font-size: 15px; font-weight: 700; margin-bottom: 4px; }
     .pay-amt { font-size: 26px; font-weight: 700; color: var(--accent2); margin: 4px 0 10px; }
-    .pay-methods {
-      display: flex; gap: 6px; justify-content: center; flex-wrap: wrap;
-    }
+    .pay-methods { display: flex; gap: 6px; justify-content: center; flex-wrap: wrap; }
     .pm {
       font-size: 9px; font-weight: 700;
       background: var(--surface); border: 1px solid var(--border);
@@ -403,7 +379,6 @@
     }
     .secure-badge i { color: var(--green); font-size: 11px; }
 
-    /* Spinner */
     .spin {
       width: 14px; height: 14px;
       border: 2px solid rgba(255,255,255,.25);
@@ -414,7 +389,6 @@
     }
     @keyframes rot { to { transform: rotate(360deg); } }
 
-    /* Success */
     .success-wrap { text-align: center; padding: 8px 0; }
     .s-icon {
       width: 54px; height: 54px;
@@ -435,7 +409,6 @@
       line-height: 1.8;
     }
 
-    /* ===== HISTORY ===== */
     .history-empty { font-size: 11px; color: var(--text3); padding: 8px 0; }
     .hist-item {
       display: flex; justify-content: space-between; align-items: center;
@@ -454,6 +427,7 @@
       border-bottom: 1px solid var(--border);
       background: var(--surface2);
       display: flex; align-items: center; justify-content: space-between;
+      flex-shrink: 0;
     }
     .sidebar-hdr-title {
       font-family: var(--font-head); font-size: 13px; font-weight: 700;
@@ -461,54 +435,45 @@
     }
     .sidebar-hdr-title i { color: var(--accent); }
 
+    /* ===== CHAT IFRAME â€” auto-fit, fills remaining panel height ===== */
     .se-iframe-wrap {
       flex: 1;
+      position: relative;
+      overflow: hidden;
       background: #0a0a0f;
+      min-height: 0;
     }
     .se-iframe-wrap iframe {
-      width: 100%; height: 100%;
-      border: none; display: block;
-      min-height: 320px;
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%;
+      height: 100%;
+      border: none;
+      display: block;
+      /* scale-down ensures content fits without horizontal scroll */
+      transform-origin: top left;
     }
 
-    /* Recent tips in sidebar */
-    .recent-tips {
-      border-top: 1px solid var(--border);
-      padding: 12px 14px;
-      background: var(--surface2);
+    /* StreamElements overlay placeholder when no URL is set */
+    .se-placeholder {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100%;
+      gap: 10px;
+      padding: 24px;
+      text-align: center;
+      color: var(--text3);
+      font-size: 11px;
     }
-    .rt-hdr {
-      font-size: 9px; font-weight: 700;
-      text-transform: uppercase; letter-spacing: .08em;
-      color: var(--text3); margin-bottom: 8px;
-    }
-    .rt-item {
-      display: flex; justify-content: space-between;
-      font-size: 11px; padding: 5px 0;
-      border-bottom: 1px solid var(--border);
-    }
-    .rt-item:last-child { border-bottom: none; }
-    .rt-item .rt-name { color: var(--text2); }
-    .rt-item .rt-val { color: var(--accent2); font-weight: 700; }
-
-    .sidebar-note {
-      padding: 8px 14px;
-      font-size: 9px; color: var(--text3);
-      text-align: center; background: var(--surface);
-      border-top: 1px solid var(--border);
-    }
+    .se-placeholder i { font-size: 28px; color: var(--border2); margin-bottom: 4px; }
 
     /* ===== MOBILE ===== */
     @media (max-width: 900px) {
       body { padding: 6px; }
-      .main-layout {
-        grid-template-columns: 1fr;
-      }
-      .right-panel {
-        border-left: none;
-        border-top: 1px solid var(--border);
-      }
-      .se-iframe-wrap { min-height: 340px; }
+      .main-layout { grid-template-columns: 1fr; }
+      .right-panel { border-left: none; border-top: 1px solid var(--border); min-height: 420px; }
       .app { border-radius: 14px; }
     }
 
@@ -521,7 +486,6 @@
       .payment-panel { padding: 12px; }
     }
 
-    /* ===== SCROLLBAR ===== */
     ::-webkit-scrollbar { width: 4px; }
     ::-webkit-scrollbar-track { background: var(--surface); }
     ::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 4px; }
@@ -531,7 +495,6 @@
 <body>
 <div class="app">
 
-  <!-- TOPBAR -->
   <div class="topbar">
     <div class="logo">
       <div class="logo-mark"><i class="ti ti-brand-youtube"></i></div>
@@ -547,13 +510,10 @@
     </div>
   </div>
 
-  <!-- MAIN LAYOUT -->
   <div class="main-layout">
 
     <!-- LEFT: Stream + Tip form -->
     <div class="left-panel">
-
-      <!-- YouTube Embed -->
       <div class="yt-wrapper" id="ytWrapper">
         <iframe id="youtubeStream"
                 src="about:blank"
@@ -563,7 +523,6 @@
                 referrerpolicy="strict-origin-when-cross-origin"
                 allowfullscreen>
         </iframe>
-        <!-- Fallback overlay shown when embed fails (Error 153 / embedding disabled) -->
         <div class="yt-fallback" id="ytFallback">
           <div class="yt-fallback-icon"><i class="ti ti-player-play-filled"></i></div>
           <div>
@@ -575,37 +534,33 @@
           </a>
           <div class="yt-fallback-hints">
             Common causes:<br>
-            • Embedding disabled by creator<br>
-            • Age-restricted / members-only<br>
-            • Incorrect video ID<br>
+            â€¢ Embedding disabled by creator<br>
+            â€¢ Age-restricted / members-only<br>
+            â€¢ Incorrect video ID<br>
             <br>
-            <a href="#" onclick="loadTestVideo();return false;" style="color:var(--accent2)">▸ Load a test video instead</a>
+            <a href="#" onclick="loadTestVideo();return false;" style="color:var(--accent2)">â–¸ Load a test video instead</a>
           </div>
         </div>
       </div>
 
-      <!-- YouTube URL bar -->
       <div class="url-bar">
         <i class="ti ti-link"></i>
         <input type="text" id="ytUrlInput" placeholder="YouTube URL, video ID, or live stream URL">
         <button class="load-btn" onclick="loadYT()">Load</button>
       </div>
 
-      <!-- Tip banner -->
       <div class="tip-banner" id="tip-banner">
         <div class="tip-av" id="tip-av">SJ</div>
-        <div class="tip-banner-text"><strong id="tip-name">—</strong> just tipped!</div>
-        <div class="tip-banner-amt" id="tip-amt">₹0</div>
+        <div class="tip-banner-text"><strong id="tip-name">â€”</strong> just tipped!</div>
+        <div class="tip-banner-amt" id="tip-amt">â‚¹0</div>
       </div>
 
-      <!-- Payment panel -->
       <div class="payment-panel">
         <div class="ptabs">
-          <div class="ptab active" id="tab-tip" onclick="switchTab('tip')">💎 Tip Streamer</div>
-          <div class="ptab" id="tab-history" onclick="switchTab('history')">📜 History</div>
+          <div class="ptab active" id="tab-tip" onclick="switchTab('tip')">ðŸ’Ž Tip Streamer</div>
+          <div class="ptab" id="tab-history" onclick="switchTab('history')">ðŸ“œ History</div>
         </div>
 
-        <!-- TIP PANEL -->
         <div id="panel-tip">
           <div class="step-row">
             <div class="sp cur" id="sp1">1</div><div class="sl" id="sl1"></div>
@@ -614,7 +569,6 @@
             <div class="sp" id="sp4">4</div>
           </div>
 
-          <!-- Step 1: Details -->
           <div class="step-panel vis" id="step1">
             <div class="fld">
               <label class="fld-label">Your Name</label>
@@ -625,40 +579,38 @@
               <input type="email" id="f-email" placeholder="you@example.com">
             </div>
             <div class="fld">
-              <label class="fld-label">Tip Amount (₹)</label>
+              <label class="fld-label">Tip Amount (â‚¹)</label>
               <div class="amt-grid">
-                <button class="amt-chip" onclick="pickAmt(10,this)">₹10</button>
-                <button class="amt-chip" onclick="pickAmt(29,this)">₹29</button>
-                <button class="amt-chip" onclick="pickAmt(49,this)">₹49</button>
-                <button class="amt-chip" onclick="pickAmt(100,this)">₹100</button>
-                <button class="amt-chip" onclick="pickAmt(200,this)">₹200</button>
+                <button class="amt-chip" onclick="pickAmt(10,this)">â‚¹10</button>
+                <button class="amt-chip" onclick="pickAmt(29,this)">â‚¹29</button>
+                <button class="amt-chip" onclick="pickAmt(49,this)">â‚¹49</button>
+                <button class="amt-chip" onclick="pickAmt(100,this)">â‚¹100</button>
+                <button class="amt-chip" onclick="pickAmt(200,this)">â‚¹200</button>
                 <button class="amt-chip" onclick="pickAmt(0,this)">custom</button>
               </div>
               <input type="number" id="f-amount" placeholder="or enter custom amount" min="1" style="margin-top:2px;">
             </div>
             <div class="fld">
               <label class="fld-label">Message (optional)</label>
-              <input type="text" id="f-msg" placeholder="Cheer or shoutout for the stream…">
+              <input type="text" id="f-msg" placeholder="Cheer or shoutout for the streamâ€¦">
             </div>
             <button class="btn btn-primary" onclick="goStep(2)">Review tip <i class="ti ti-arrow-right"></i></button>
           </div>
 
-          <!-- Step 2: Review -->
           <div class="step-panel" id="step2">
             <div class="review-box">
-              <div class="rv-row"><span>Name</span><span id="r-name">—</span></div>
-              <div class="rv-row"><span>Amount</span><span style="color:var(--accent2);font-size:14px" id="r-amt">₹0</span></div>
-              <div class="rv-row"><span>Message</span><span id="r-msg" style="max-width:60%;text-align:right">—</span></div>
+              <div class="rv-row"><span>Name</span><span id="r-name">â€”</span></div>
+              <div class="rv-row"><span>Amount</span><span style="color:var(--accent2);font-size:14px" id="r-amt">â‚¹0</span></div>
+              <div class="rv-row"><span>Message</span><span id="r-msg" style="max-width:60%;text-align:right">â€”</span></div>
             </div>
             <button class="btn btn-primary" onclick="goStep(3)"><i class="ti ti-lock"></i> Proceed to Payment</button>
-            <button class="btn btn-ghost" onclick="goStep(1)">← Edit details</button>
+            <button class="btn btn-ghost" onclick="goStep(1)">â† Edit details</button>
           </div>
 
-          <!-- Step 3: Payment -->
           <div class="step-panel" id="step3">
             <div class="pay-gate">
               <div class="pay-title">Cashfree Secure Payment</div>
-              <div class="pay-amt" id="pay-amt">₹0</div>
+              <div class="pay-amt" id="pay-amt">â‚¹0</div>
               <div class="pay-methods">
                 <span class="pm">UPI</span>
                 <span class="pm">Cards</span>
@@ -671,24 +623,22 @@
               <span id="pay-txt">Pay Now</span>
               <div class="spin" id="pay-spin"></div>
             </button>
-            <button class="btn btn-ghost" onclick="goStep(2)">← Back</button>
+            <button class="btn btn-ghost" onclick="goStep(2)">â† Back</button>
           </div>
 
-          <!-- Step 4: Success -->
           <div class="step-panel" id="step4">
             <div class="success-wrap">
               <div class="s-icon"><i class="ti ti-check"></i></div>
-              <div class="s-title">Tip Sent! 🎉</div>
+              <div class="s-title">Tip Sent! ðŸŽ‰</div>
               <div class="s-sub">Your tip will appear on stream shortly</div>
               <div class="log-mini" id="log-mini"></div>
-              <button class="btn btn-primary" onclick="resetFlow()">➕ Send another tip</button>
+              <button class="btn btn-primary" onclick="resetFlow()">âž• Send another tip</button>
             </div>
           </div>
         </div>
 
-        <!-- HISTORY PANEL -->
         <div id="panel-history" style="display:none;">
-          <div style="font-size:10px;color:var(--text3);margin-bottom:10px;text-transform:uppercase;letter-spacing:.07em;">✨ Recent donations this session</div>
+          <div style="font-size:10px;color:var(--text3);margin-bottom:10px;text-transform:uppercase;letter-spacing:.07em;">âœ¨ Recent donations this session</div>
           <div id="history-list"></div>
         </div>
       </div>
@@ -700,7 +650,9 @@
         <div class="sidebar-hdr-title"><i class="ti ti-message-chat"></i> Live Chat</div>
         <div style="font-size:9px;color:var(--text3);">StreamElements</div>
       </div>
-      <div class="se-iframe-wrap">
+
+      <!-- Chat iframe â€” fills all remaining height, auto-fit -->
+      <div class="se-iframe-wrap" id="seChatWrap">
         <iframe id="seChatIframe"
                 src="about:blank"
                 title="StreamElements Chat Overlay"
@@ -708,45 +660,68 @@
                 sandbox="allow-same-origin allow-scripts allow-popups allow-forms allow-modals">
         </iframe>
       </div>
-     
-      </div>
-      
     </div>
+
   </div>
 </div>
+
 <footer style="background:#222;color:#fff;padding:20px;text-align:center;margin-top:40px;">
-    <p style="margin:0 0 10px 0;">&copy; 2026 Krinzy_donation. All Rights Reserved.</p>
-
-    <div>
-        <a href="contact.html"
-           style="color:#ffffff;text-decoration:none;margin:0 15px;">
-           Contact Us
-        </a>
-
-        <a href="refund.html"
-           style="color:#ffffff;text-decoration:none;margin:0 15px;">
-           Refunds & Cancellations
-        </a>
-
-        <a href="terms.html"
-           style="color:#ffffff;text-decoration:none;margin:0 15px;">
-           Terms & Conditions
-        </a>
-    </div>
+  <p style="margin:0 0 10px 0;">&copy; 2026 Krinzy_donation. All Rights Reserved.</p>
+  <div>
+    <a href="contact.html" style="color:#ffffff;text-decoration:none;margin:0 15px;">Contact Us</a>
+    <a href="refund.html" style="color:#ffffff;text-decoration:none;margin:0 15px;">Refunds &amp; Cancellations</a>
+    <a href="terms.html" style="color:#ffffff;text-decoration:none;margin:0 15px;">Terms &amp; Conditions</a>
+  </div>
 </footer>
+
 <script>
   // ==========================================
-  // ENV CONFIG — only edit these
-  // SE overlay URL is NOT shown in the UI
+  // ENV CONFIG
   // ==========================================
   const ENV = {
     DEFAULT_YOUTUBE_URL: 'https://youtu.be/pMyiMBzY3Qw?si=oyM6ytWa30kV_mz5',
-    SE_CHAT_URL: '',  // Set your StreamElements overlay URL here — hidden from UI
-    DONATION_ENDPOINT: 'https://bvavtdyxuzzabzgodbjw.supabase.co/functions/v1/donation'
+    DONATION_ENDPOINT:   'https://bvavtdyxuzzabzgodbjw.supabase.co/functions/v1/donation'
   };
 
+  // StreamElements overlay â€” loaded immediately on page open/reload
+  const SE_URL = 'https://streamelements.com/overlay/6a2f903bf2ed77a9eab2af9e/-CfHBVXo37hUWEw8eZZ4MvlfzFtAeHOsfQgZjJWigVHG9XSI';
+
   // ==========================================
-  // YOUTUBE: robust embed with fallback
+  // SE CHAT â€” auto-fit scaling
+  // ==========================================
+  function initSEChat() {
+    const iframe = document.getElementById('seChatIframe');
+    const wrap   = document.getElementById('seChatWrap');
+
+    iframe.src = SE_URL;
+
+    // Auto-fit: scale iframe content to fill the container without scrollbars.
+    // StreamElements overlays are typically 1920Ã—1080 or similar fixed dimensions;
+    // we scale them down to fit the 340px sidebar width proportionally.
+    function fitChat() {
+      const W = wrap.offsetWidth;
+      const H = wrap.offsetHeight;
+      if (!W || !H) return;
+
+      // The overlay's native design width â€” SE overlays are usually 1920px wide
+      const NATIVE_W = 1920;
+      const scale    = W / NATIVE_W;
+
+      iframe.style.width     = NATIVE_W + 'px';
+      iframe.style.height    = Math.round(H / scale) + 'px';
+      iframe.style.transform = `scale(${scale})`;
+      iframe.style.transformOrigin = 'top left';
+    }
+
+    fitChat();
+    window.addEventListener('resize', fitChat);
+
+    // Re-fit after iframe loads in case content changes layout
+    iframe.addEventListener('load', () => setTimeout(fitChat, 200));
+  }
+
+  // ==========================================
+  // YOUTUBE
   // ==========================================
   function extractVideoId(input) {
     if (!input) return null;
@@ -766,7 +741,6 @@
   }
 
   function buildEmbedUrl(videoId) {
-    // origin param is critical — it must match the page's origin
     const origin = encodeURIComponent(location.origin || 'https://streamtip.app');
     return `https://www.youtube.com/embed/${videoId}?autoplay=1&rel=0&modestbranding=1&enablejsapi=1&origin=${origin}`;
   }
@@ -784,10 +758,7 @@
     const fallback = document.getElementById('ytFallback');
     const fbLink   = document.getElementById('ytFallbackLink');
 
-    // Set the Watch on YouTube fallback link regardless
-    fbLink.href = videoId
-      ? `https://www.youtube.com/watch?v=${videoId}`
-      : url;
+    fbLink.href = videoId ? `https://www.youtube.com/watch?v=${videoId}` : url;
 
     if (!videoId) {
       iframe.src = 'about:blank';
@@ -795,46 +766,27 @@
       return;
     }
 
-    // Hide fallback, load embed
     fallback.classList.remove('show');
     iframe.src = buildEmbedUrl(videoId);
-
-    // Detect Error 153 / embed blocked via load event + postMessage
-    iframe.onload = () => {
-      // Give YT player 3s to initialise; if it fires error via postMessage we catch it
-    };
   }
 
-  // YouTube sends postMessage events — catch player errors
   window.addEventListener('message', (e) => {
     if (!e.origin.includes('youtube.com')) return;
     try {
       const data = typeof e.data === 'string' ? JSON.parse(e.data) : e.data;
-      // YT player error codes: 2=invalid param, 5=HTML5 error, 100=not found, 101/150=embed blocked
       if (data && data.event === 'onError' && [100, 101, 150, 5].includes(data.info)) {
         document.getElementById('ytFallback').classList.add('show');
       }
     } catch {}
   });
 
-  function loadTestVideo() {
-    loadYT('');
-  }
-
-  // ==========================================
-  // STREAMELEMENTS — env-only, no UI input
-  // ==========================================
-  function initSEChat() {
-    if (ENV.SE_CHAT_URL && !ENV.SE_CHAT_URL.includes('YOUR_CHANNEL')) {
-      document.getElementById('seChatIframe').src = ENV.SE_CHAT_URL;
-    }
-  }
+  function loadTestVideo() { loadYT('https://www.youtube.com/watch?v=dQw4w9WgXcQ'); }
 
   // ==========================================
   // VIEWER COUNT TICKER
   // ==========================================
   setInterval(() => {
-    const el = document.getElementById('viewer-count');
+    const el  = document.getElementById('viewer-count');
     const cur = parseFloat(el.innerText) * 1000 || 1400;
     const next = Math.max(800, cur + Math.floor(Math.random() * 40) - 20);
     el.innerText = (next / 1000).toFixed(1) + 'k';
@@ -860,79 +812,67 @@
       const name  = document.getElementById('f-name').value.trim();
       const email = document.getElementById('f-email').value.trim();
       const amt   = parseFloat(document.getElementById('f-amount').value);
-      if (!name)                                       { alert('Please enter your name'); return; }
+      if (!name)                                            { alert('Please enter your name'); return; }
       if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { alert('Enter a valid email'); return; }
-      if (!amt || amt < 1)                             { alert('Minimum tip is ₹1'); return; }
+      if (!amt || amt < 1)                                  { alert('Minimum tip is â‚¹1'); return; }
       state = { name, email, amount: amt, msg: document.getElementById('f-msg').value.trim() };
       document.getElementById('r-name').innerText = name;
-      document.getElementById('r-amt').innerText  = '₹' + Math.round(amt);
+      document.getElementById('r-amt').innerText  = 'â‚¹' + Math.round(amt);
       document.getElementById('r-msg').innerText  = state.msg || '(no message)';
-      document.getElementById('pay-amt').innerText = '₹' + Math.round(amt);
+      document.getElementById('pay-amt').innerText = 'â‚¹' + Math.round(amt);
     }
     curStep = n;
     for (let i = 1; i <= 4; i++) {
       document.getElementById('step' + i).classList.toggle('vis', i === n);
       const pip = document.getElementById('sp' + i);
       pip.className = 'sp' + (i < n ? ' done' : i === n ? ' cur' : '');
-      pip.innerHTML = i < n ? '✓' : i;
+      pip.innerHTML = i < n ? 'âœ“' : i;
       if (i < 4) document.getElementById('sl' + i).className = 'sl' + (i < n ? ' done' : '');
     }
   }
 
   async function doPay() {
-  const btn  = document.getElementById('pay-btn');
-  const txt  = document.getElementById('pay-txt');
-  const spin = document.getElementById('pay-spin');
+    const btn  = document.getElementById('pay-btn');
+    const txt  = document.getElementById('pay-txt');
+    const spin = document.getElementById('pay-spin');
 
-  btn.disabled = true;
-  txt.textContent = 'Processing…';
-  spin.style.display = 'block';
+    btn.disabled = true;
+    txt.textContent = 'Processingâ€¦';
+    spin.style.display = 'block';
 
-  try {
-    // Step 1: Create order
-    const res = await fetch('/api/create-order', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        name:    state.name,
-        email:   state.email,
-        amount:  state.amount,
-        message: state.msg
-      })
-    });
+    try {
+      const res = await fetch('/api/create-order', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name: state.name, email: state.email, amount: state.amount, message: state.msg })
+      });
 
-    const data = await res.json();
-    console.log('Order response:', data); // ← check this in browser console
+      const data = await res.json();
+      if (!res.ok || !data.payment_session_id) {
+        alert('Error: ' + (data.error || data.cf_response?.message || 'No session ID returned'));
+        return;
+      }
 
-    if (!res.ok || !data.payment_session_id) {
-      alert('Error: ' + (data.error || data.cf_response?.message || 'No session ID returned'));
-      return;
+      const cashfree = Cashfree({ mode: 'production' });
+      await cashfree.checkout({
+        paymentSessionId: data.payment_session_id,
+        returnUrl: `${window.location.origin}/thankyou?order_id=${data.order_id}`,
+      });
+
+    } catch (err) {
+      console.error(err);
+      alert('Error: ' + err.message);
+    } finally {
+      spin.style.display = 'none';
+      btn.disabled = false;
+      txt.textContent = 'Pay Now';
     }
-
-    // Step 2: Open Cashfree checkout
-    const cashfree = Cashfree({
-  mode: 'production'
-});
-
-await cashfree.checkout({
-  paymentSessionId: data.payment_session_id,
-  returnUrl: `${window.location.origin}/thankyou?order_id=${data.order_id}`,
-});
-
-  } catch (err) {
-    console.error(err);
-    alert('Error: ' + err.message);
-  } finally {
-    spin.style.display = 'none';
-    btn.disabled = false;
-    txt.textContent = 'Pay Now';
   }
-}
 
   function showBanner(name, amt) {
     document.getElementById('tip-av').innerText   = name.slice(0, 2).toUpperCase();
     document.getElementById('tip-name').innerText = name;
-    document.getElementById('tip-amt').innerText  = '₹' + Math.round(amt);
+    document.getElementById('tip-amt').innerText  = 'â‚¹' + Math.round(amt);
     const b = document.getElementById('tip-banner');
     b.classList.add('show');
     setTimeout(() => b.classList.remove('show'), 5000);
@@ -941,31 +881,22 @@ await cashfree.checkout({
   function renderHistory() {
     const el = document.getElementById('history-list');
     if (!tipHistory.length) {
-      el.innerHTML = '<div class="history-empty">✨ Be the first to tip this session</div>';
+      el.innerHTML = '<div class="history-empty">âœ¨ Be the first to tip this session</div>';
       return;
     }
     el.innerHTML = tipHistory.map(t => `
       <div class="hist-item">
         <span class="hist-name">${t.name}</span>
         <span class="hist-ts">${new Date(t.ts).toLocaleTimeString()}</span>
-        <span class="hist-amt">₹${Math.round(t.amount)}</span>
+        <span class="hist-amt">â‚¹${Math.round(t.amount)}</span>
       </div>
     `).join('');
-  }
-
-  function addTopTip(name, amt) {
-    const list = document.getElementById('rt-list');
-    const item = document.createElement('div');
-    item.className = 'rt-item';
-    item.innerHTML = `<span class="rt-name">${name}</span><span class="rt-val">₹${Math.round(amt)}</span>`;
-    list.insertBefore(item, list.firstChild);
-    if (list.children.length > 5) list.removeChild(list.lastChild);
   }
 
   function switchTab(t) {
     document.getElementById('tab-tip').classList.toggle('active', t === 'tip');
     document.getElementById('tab-history').classList.toggle('active', t === 'history');
-    document.getElementById('panel-tip').style.display    = t === 'tip' ? 'block' : 'none';
+    document.getElementById('panel-tip').style.display     = t === 'tip'     ? 'block' : 'none';
     document.getElementById('panel-history').style.display = t === 'history' ? 'block' : 'none';
     if (t === 'history') renderHistory();
   }
@@ -978,11 +909,11 @@ await cashfree.checkout({
   }
 
   // ==========================================
-  // INIT
+  // INIT â€” runs on every page open / reload
   // ==========================================
   function init() {
     loadYT(ENV.DEFAULT_YOUTUBE_URL);
-    initSEChat();
+    initSEChat();   // loads SE_URL immediately, applies auto-fit scaling
     renderHistory();
   }
   init();
