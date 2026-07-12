@@ -1,0 +1,24 @@
+{
+  "name": "donationalert",
+  "version": "1.0.0",
+  "description": "A complete donation/tip system for YouTube live streamers. Viewers tip via a beautiful web page, payment is verified automatically, StreamElements alert fires on stream, and a message appears in YouTube Live chat.",
+  "main": "donate.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ajay35et/donationalert.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/ajay35et/donationalert/issues"
+  },
+  "homepage": "https://github.com/ajay35et/donationalert#readme",
+  "dependencies": {
+    "jsdom": "^29.1.1"
+  }
+}

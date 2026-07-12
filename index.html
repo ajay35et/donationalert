@@ -300,7 +300,6 @@
         <textarea class="textarea" id="messageInput" placeholder="Your message (optional)"></textarea>
       </div>
 
-      
       <button class="submit-btn" id="submitBtn" disabled><i class="ti ti-heart"></i> <span id="submitLabel">SUPPORT ₹0</span></button>
 
       <div class="footer-note">
@@ -372,7 +371,6 @@
     document.getElementById('amountFieldLabel').textContent = cfg.labels.amountField;
     document.getElementById('messageFieldLabel').textContent = cfg.labels.messageField;
     document.getElementById('messageInput').placeholder = cfg.labels.messagePlaceholder;
-    document.getElementById('loyaltyLabel').textContent = cfg.labels.loyaltyLabel;
     document.getElementById('currencyBox').textContent = `${cfg.currency.symbol} ${cfg.currency.code}`;
     document.getElementById('msgCounter').textContent = `0/${cfg.messageMaxLength}`;
     document.getElementById('messageInput').maxLength = cfg.messageMaxLength;
@@ -438,13 +436,6 @@
     });
   }
 
-  function currentTier(amount){
-    if (!CFG.loyalty.enabled) return { multiplier:1 };
-    let tier = CFG.loyalty.tiers[0];
-    CFG.loyalty.tiers.forEach(t => { if (amount >= t.minAmount) tier = t; });
-    return tier;
-  }
-
   function updateAll(){
     const amount = parseFloat(document.getElementById('amountInput').value) || 0;
     const maxMin = Math.max(...CFG.messageTypes.map(t=>t.minAmount));
@@ -491,14 +482,6 @@
       if (typeId !== 'media') clearMediaFile();
       if (typeId !== 'audio') clearAudioFile();
     }
-
-    // loyalty points
-    const tier = currentTier(amount);
-    let points = 0;
-    if (CFG.loyalty.enabled && activeType && amount > 0) {
-      points = Math.round((amount / 100) * activeType.loyaltyPointsPer100 * tier.multiplier);
-    }
-    document.getElementById('loyaltyPts').textContent = `${CFG.labels.loyaltyEarnedPrefix}${points}${CFG.labels.loyaltyEarnedSuffix}`;
 
     // submit button
     const btn = document.getElementById('submitBtn');
