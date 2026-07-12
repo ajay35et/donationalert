@@ -5,6 +5,11 @@ const SUPABASE_URL  = process.env.SUPABASE_URL;
 const SUPABASE_KEY  = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
 async function supabase(method, path, body) {
+  if (!SUPABASE_URL || !SUPABASE_KEY) {
+    console.warn('[create-order] Supabase not configured; skipping persistence');
+    return null;
+  }
+
   const res = await fetch(`${SUPABASE_URL}/rest/v1${path}`, {
     method,
     headers: {
@@ -23,17 +28,77 @@ async function supabase(method, path, body) {
 }
 
 async function insertPending({ order_id, provider, amount, currency = 'INR', name, email, message, provider_order_id }) {
-  await supabase('POST', '/donations', {
-    order_id,
-    provider,
-    status:         'pending',
-    amount,
-    currency,
-    customer_name:  name,
-    customer_email: email,
-    message:        message || '',
-    ...(provider_order_id ? { provider_order_id } : {}),
-  });
+  try {
+    await supabase('POST', '/donations', {
+      order_id,
+      provider,
+      status:         'pending',
+      amount,
+      currency,
+      customer_name:  name,
+      customer_email: email,
+      message:        message || '',
+      ...(provider_order_id ? { provider_order_id } : {}),
+    });
+  } catch (err) {
+    console.error('[create-order] pending insert failed', err.message);
+  }
+}
+
+function firstNonEmpty(...values) {
+  return values.find(v => typeof v === 'string' && v.trim() !== '') || '';
+}
+
+function resolveModeInfo() {
+  const explicit = String(process.env.PRODUCTION_MODE || '').trim().toLowerCase();
+  if (['true', 'production', 'live', '1'].includes(explicit)) {
+    return { isTestMode: false, mode: 'PRODUCTION' };
+  }
+  if (['false', 'sandbox', 'test', 'dev', 'development', '0'].includes(explicit)) {
+    return { isTestMode: true, mode: 'TEST' };
+  }
+  if (process.env.VERCEL_ENV === 'production') {
+    return { isTestMode: false, mode: 'PRODUCTION' };
+  }
+  return { isTestMode: true, mode: 'TEST' };
+}
+
+function resolveCashfreeCredentials(isTestMode) {
+  const appId = isTestMode
+    ? firstNonEmpty(
+        process.env.CASHFREE_SANDBOX_APP_ID,
+        process.env.CASHFREE_TEST_APP_ID,
+        process.env.CASHFREE_APP_ID,
+        process.env.CASHFREE_CLIENT_ID,
+      )
+    : firstNonEmpty(
+        process.env.CASHFREE_APP_ID,
+        process.env.CASHFREE_LIVE_APP_ID,
+        process.env.CASHFREE_SANDBOX_APP_ID,
+        process.env.CASHFREE_CLIENT_ID,
+      );
+
+  const secretKey = isTestMode
+    ? firstNonEmpty(
+        process.env.CASHFREE_SANDBOX_SECRET_KEY,
+        process.env.CASHFREE_TEST_SECRET_KEY,
+        process.env.CASHFREE_SECRET_KEY,
+        process.env.CASHFREE_CLIENT_SECRET,
+      )
+    : firstNonEmpty(
+        process.env.CASHFREE_SECRET_KEY,
+        process.env.CASHFREE_LIVE_SECRET_KEY,
+        process.env.CASHFREE_SANDBOX_SECRET_KEY,
+        process.env.CASHFREE_CLIENT_SECRET,
+      );
+
+  const baseUrl = firstNonEmpty(
+    process.env.CASHFREE_BASE_URL,
+    process.env.CASHFREE_API_URL,
+    isTestMode ? 'https://sandbox.cashfree.com/pg' : 'https://api.cashfree.com/pg'
+  );
+
+  return { appId, secretKey, baseUrl };
 }
 
 // ─── Main handler ────────────────────────────────────────────────────────────
@@ -54,8 +119,8 @@ export default async function handler(req, res) {
   const orderId  = 'tip' + Date.now() + crypto.randomBytes(3).toString('hex');
   const origin   = req.headers.origin || req.headers.host || '';
   const baseUrl  = origin.startsWith('http') ? origin : `https://${origin}`;
-  const isTestMode = process.env.PRODUCTION_MODE !== 'true';
-  const modeInfo = { mode: isTestMode ? 'TEST' : 'PRODUCTION' };
+  const modeInfo = resolveModeInfo();
+  const isTestMode = modeInfo.isTestMode;
 
   console.log(`[create-order] provider=${provider || 'cashfree'} amount=${parsedAmount} mode=${modeInfo.mode}`);
 
@@ -72,23 +137,19 @@ export default async function handler(req, res) {
 
 // ─── Cashfree ────────────────────────────────────────────────────────────────
 async function handleCashfree(res, { name, email, amount, message, orderId, baseUrl, modeInfo, isTestMode }) {
-  const appId = isTestMode
-    ? (process.env.CASHFREE_SANDBOX_APP_ID    || process.env.CASHFREE_APP_ID)
-    : process.env.CASHFREE_APP_ID;
-  const secretKey = isTestMode
-    ? (process.env.CASHFREE_SANDBOX_SECRET_KEY || process.env.CASHFREE_SECRET_KEY)
-    : process.env.CASHFREE_SECRET_KEY;
+  const creds = resolveCashfreeCredentials(isTestMode);
+  const appId = creds.appId;
+  const secretKey = creds.secretKey;
 
   if (!appId || !secretKey) {
     return res.status(500).json({
       error: `Cashfree credentials not set for ${modeInfo.mode} mode`,
       code:  'MISSING_CREDENTIAL',
+      hint:  'Set CASHFREE_APP_ID / CASHFREE_SECRET_KEY for production or CASHFREE_SANDBOX_APP_ID / CASHFREE_SANDBOX_SECRET_KEY for sandbox',
     });
   }
 
-  const cfBaseUrl = isTestMode
-    ? 'https://sandbox.cashfree.com/pg'
-    : 'https://api.cashfree.com/pg';
+  const cfBaseUrl = creds.baseUrl;
 
   try {
     const cfRes = await fetch(`${cfBaseUrl}/orders`, {
