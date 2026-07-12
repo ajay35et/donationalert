@@ -143,8 +143,13 @@
     <!-- Step 2: Payment method -->
     <div class="step-panel" id="step2">
       <div class="fld">
-        <label class="fld-label">Payment Method</label>
-        <div class="fld-select" style="pointer-events:none; background:#f5f7fb;">Cashfree</div>
+        <label class="fld-label">Select Payment Method</label>
+        <select id="payment-method" class="fld-select" onchange="updatePaymentUI()">
+          <option value="cashfree">Cashfree</option>
+          <option value="razorpay">Razorpay</option>
+          <option value="paypal">PayPal</option>
+          <option value="stripe">Stripe</option>
+        </select>
       </div>
       <div class="pay-gate">
         <div class="pay-title" id="pay-provider-title">Cashfree Secure Payment</div>
@@ -211,23 +216,39 @@
   };
 
   window.updatePaymentUI = function(){
+    const provider = document.getElementById('payment-method').value;
     const titleEl = document.getElementById('pay-provider-title');
     const methodsEl = document.getElementById('pay-methods-display');
-    titleEl.textContent = 'Cashfree Secure Payment';
-    methodsEl.innerHTML = '<span class="pm">UPI</span><span class="pm">Cards</span><span class="pm">NetBanking</span><span class="pm">Wallets</span>';
+    if (provider === 'razorpay') {
+      titleEl.textContent = 'Razorpay Secure Payment';
+      methodsEl.innerHTML = '<span class="pm">UPI</span><span class="pm">Cards</span><span class="pm">NetBanking</span><span class="pm">Wallets</span>';
+    } else if (provider === 'paypal') {
+      titleEl.textContent = 'PayPal Payment';
+      methodsEl.innerHTML = '<span class="pm">PayPal Account</span><span class="pm">Credit Card</span><span class="pm">Debit Card</span>';
+    } else if (provider === 'stripe') {
+      titleEl.textContent = 'Stripe Secure Payment';
+      methodsEl.innerHTML = '<span class="pm">Cards</span><span class="pm">Apple Pay</span><span class="pm">Google Pay</span>';
+    } else {
+      titleEl.textContent = 'Cashfree Secure Payment';
+      methodsEl.innerHTML = '<span class="pm">UPI</span><span class="pm">Cards</span><span class="pm">NetBanking</span><span class="pm">Wallets</span>';
+    }
   };
 
   window.doPay = async function(){
     const btn  = document.getElementById('pay-btn');
     const txt  = document.getElementById('pay-txt');
     const spin = document.getElementById('pay-spin');
+    const provider = document.getElementById('payment-method').value;
 
     btn.disabled = true;
     txt.textContent = 'Processing…';
     spin.style.display = 'block';
 
     try {
-      await handleCashfree();
+      if (provider === 'razorpay')      await handleRazorpay();
+      else if (provider === 'paypal')   await handlePaypal();
+      else if (provider === 'stripe')   await handleStripe();
+      else                              await handleCashfree();
     } catch (err) {
       console.error(err);
       alert('Error: ' + err.message);
