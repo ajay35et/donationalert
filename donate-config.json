@@ -71,7 +71,7 @@
       { "name": "Bronze Supporter", "minAmount": 1,   "multiplier": 1 },
       { "name": "Silver Supporter", "minAmount": 200, "multiplier": 1.25 },
       { "name": "Gold Supporter",   "minAmount": 500, "multiplier": 1.5 },
-      { "name": "Champ Legend",     "minAmount": 1000,"multiplier": 2 }
+      { "name": "Legend Supporter",     "minAmount": 1000,"multiplier": 2 }
     ]
   },
 
