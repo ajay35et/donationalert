@@ -40,7 +40,7 @@
       "icon": "image",
       "color": "#a855f7",
       "colorDim": "#2f1a45",
-      "minAmount": 3,
+      "minAmount": 300,
       "loyaltyPointsPer100": 12
     }
   ],
