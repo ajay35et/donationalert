@@ -73,6 +73,58 @@
       65% { opacity:1; }
       100%{ transform:translate(var(--tx),var(--ty)) rotate(var(--rot)); opacity:0; }
     }
+
+    /* ===== fail: hand intercepts + grabs the coin, piggy bank goes sad ===== */
+    .fail-stage{ position:relative; height:78px; margin-bottom:4px; display:flex; align-items:flex-end; justify-content:center; }
+    .fail-piggy-wrap{ position:relative; width:84px; height:64px; }
+
+    .sad-piggy{
+      font-size:52px; line-height:1; display:block; transform-origin:bottom center;
+      filter:grayscale(.6) brightness(.82);
+    }
+    .sad-piggy.droop{ animation:piggyDroop .6s ease forwards; }
+    @keyframes piggyDroop{
+      0%  { transform:translateY(0)  rotate(0deg); }
+      40% { transform:translateY(2px) rotate(-5deg); }
+      100%{ transform:translateY(3px) rotate(-4deg); }
+    }
+    .tear{ position:absolute; left:36%; top:18px; font-size:11px; opacity:0; }
+    .tear.drop{ animation:tearFall 1.1s ease-in .3s forwards; }
+    @keyframes tearFall{
+      0% { opacity:0; top:18px; }
+      18%{ opacity:1; }
+      100%{ opacity:0; top:44px; }
+    }
+
+    #failCoin.drop{ animation:coinDropShort .5s cubic-bezier(.55,0,.75,.15) forwards; }
+    @keyframes coinDropShort{
+      0%  { top:-70px; opacity:1; transform:translateX(-50%) rotate(0deg)   scale(1); }
+      100%{ top:0px;   opacity:1; transform:translateX(-50%) rotate(220deg) scale(1); }
+    }
+    #failCoin.grabbed{ transition:opacity .18s ease, transform .18s ease; opacity:0 !important; transform:translateX(-50%) translateY(-6px) scale(.6) !important; }
+
+    .hand{
+      position:absolute; left:50%; top:-40px; font-size:30px;
+      transform:translateX(-50%) translateY(-10px) rotate(-18deg); opacity:0; pointer-events:none;
+    }
+    .hand.grab{ animation:handGrab .5s ease .42s forwards; }
+    @keyframes handGrab{
+      0%  { opacity:0; top:-40px; transform:translateX(-50%) translateY(-10px) rotate(-18deg); }
+      60% { opacity:1; top:-6px;  transform:translateX(-50%) translateY(0)     rotate(0deg); }
+      100%{ opacity:1; top:-12px; transform:translateX(-50%) translateY(-6px)  rotate(12deg); }
+    }
+
+    .no-badge{
+      position:absolute; left:50%; top:-2px; font-size:24px; font-weight:900; color:#ff3f3f;
+      transform:translateX(-50%) scale(0); opacity:0; text-shadow:0 0 10px rgba(255,63,63,.6);
+    }
+    .no-badge.show{ animation:noPop .45s cubic-bezier(.34,1.56,.64,1) .95s forwards; }
+    @keyframes noPop{
+      0% { transform:translateX(-50%) scale(0);            opacity:0; }
+      60%{ transform:translateX(-50%) scale(1.25);          opacity:1; }
+      80%{ transform:translateX(-50%) scale(.9) rotate(-6deg); }
+      100%{ transform:translateX(-50%) scale(1) rotate(0deg); opacity:1; }
+    }
   </style>
 </head>
 <body>
@@ -106,7 +158,15 @@
 
   <!-- Failed / timed out -->
   <div id="state-fail" style="display:none">
-    <div class="icon">⚠️</div>
+    <div class="fail-stage">
+      <div class="fail-piggy-wrap">
+        <div class="coin" id="failCoin">🪙</div>
+        <div class="hand" id="grabHand">✋</div>
+        <div class="no-badge" id="noBadge">✕</div>
+        <div class="sad-piggy" id="sadPiggy">🐷</div>
+        <div class="tear" id="tear">💧</div>
+      </div>
+    </div>
     <h2 class="error">Payment not confirmed</h2>
     <p id="fail-msg">Could not verify your payment within 5 minutes.
        If money was deducted, please contact support with your order ID.</p>
@@ -206,6 +266,27 @@
     document.getElementById('state-fail').style.display    = state === 'fail'    ? 'block' : 'none';
     if (msg && state === 'fail') document.getElementById('fail-msg').textContent = msg;
     if (state === 'success') playSuccessAnimation();
+    if (state === 'fail')    playFailAnimation();
+  }
+
+  let failAnimationPlayed = false;
+  function playFailAnimation(){
+    if (failAnimationPlayed) return; // don't re-trigger if show('fail') fires more than once
+    failAnimationPlayed = true;
+
+    const coin  = document.getElementById('failCoin');
+    const hand  = document.getElementById('grabHand');
+    const badge = document.getElementById('noBadge');
+    const piggy = document.getElementById('sadPiggy');
+    const tear  = document.getElementById('tear');
+
+    coin.classList.add('drop');
+    hand.classList.add('grab');
+    badge.classList.add('show');
+
+    // the hand "catches" the coin mid-air right as it reaches grab position
+    setTimeout(() => coin.classList.add('grabbed'), 500);
+    setTimeout(() => { piggy.classList.add('droop'); tear.classList.add('drop'); }, 560);
   }
 
   let celebrationPlayed = false;
