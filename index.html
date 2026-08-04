@@ -16,12 +16,13 @@
     --font-head:'Syne',sans-serif; --font-mono:'JetBrains Mono',monospace;
   }
   *{margin:0;padding:0;box-sizing:border-box;}
-  html,body{height:100%;}
+  html,body{height:100%; overflow-x:hidden;}
   body{
     background:var(--bg); color:var(--text); font-family:var(--font-mono);
     overflow-x:hidden;
     display:flex; align-items:center; justify-content:center;
-    min-height:100vh;
+    min-height:100dvh;
+    padding:12px;
     background:
       radial-gradient(ellipse 900px 500px at 20% -10%, rgba(108,99,255,.14), transparent 60%),
       radial-gradient(ellipse 700px 500px at 90% 10%, rgba(34,211,238,.08), transparent 60%),
@@ -31,7 +32,7 @@
   /* ===== MODAL ===== */
   .modal{
     position:relative;
-    width:100%; max-width:420px; max-height:92vh; overflow-y:auto;
+    width:100%; max-width:420px; max-height:calc(100dvh - 24px); overflow-y:auto; overflow-x:hidden;
     background:linear-gradient(180deg,var(--surface),var(--surface2) 60%);
     border-radius:22px; border:1px solid var(--border2);
     padding:2px;
@@ -48,10 +49,10 @@
   }
   @keyframes spin{ to{ transform:rotate(360deg); } }
 
-  .modal-inner{ position:relative; padding:22px; border-radius:20px; background:var(--surface); }
+  .modal-inner{ position:relative; padding:18px 20px; border-radius:20px; background:var(--surface); }
 
   /* header */
-  .stream-head{ display:flex; align-items:center; gap:14px; margin-bottom:20px; }
+  .stream-head{ display:flex; align-items:center; gap:12px; margin-bottom:14px; }
   .avatar-wrap{ position:relative; width:56px; height:56px; flex-shrink:0; }
   .avatar-ring{
     position:absolute; inset:-3px; border-radius:50%;
@@ -81,18 +82,18 @@
   @keyframes blink{ 0%,100%{opacity:1;} 50%{opacity:.25;} }
 
   /* field group */
-  .field{ margin-bottom:18px; }
+  .field{ margin-bottom:12px; }
   .field-label{
     font-size:10px; font-weight:700; letter-spacing:.09em; color:var(--text3);
-    margin-bottom:8px; display:flex; justify-content:space-between;
+    margin-bottom:6px; display:flex; justify-content:space-between;
   }
   .text-input, .textarea{
     width:100%; background:var(--surface3); border:1px solid var(--border2); border-radius:11px;
-    padding:12px 14px; color:var(--text); font-family:var(--font-mono); font-size:13px;
+    padding:10px 14px; color:var(--text); font-family:var(--font-mono); font-size:13px;
     outline:none; transition:.15s;
   }
   .text-input:focus, .textarea:focus{ border-color:var(--cyan); box-shadow:0 0 0 3px rgba(34,211,238,.12); }
-  .textarea{ resize:none; min-height:70px; line-height:1.5; }
+  .textarea{ resize:none; min-height:46px; line-height:1.5; }
 
   /* type cards */
   @property --border-angle{ syntax:'<angle>'; inherits:false; initial-value:0deg; }
@@ -101,7 +102,7 @@
 
   .type-grid{ display:grid; grid-template-columns:repeat(3,1fr); gap:9px; }
   .type-card{
-    position:relative; z-index:0; border-radius:14px; padding:2px; cursor:pointer;
+    position:relative; z-index:0; min-width:0; border-radius:14px; padding:2px; cursor:pointer;
     background:var(--surface3);
     transition:transform .18s ease;
   }
@@ -119,14 +120,14 @@
     opacity:.55;
   }
   .type-card-inner{
-    position:relative; border-radius:13px; padding:13px 8px 11px;
-    display:flex; flex-direction:column; align-items:center; gap:6px; text-align:center;
+    position:relative; border-radius:13px; padding:10px 6px 8px; min-width:0;
+    display:flex; flex-direction:column; align-items:center; gap:4px; text-align:center;
     background:linear-gradient(160deg, color-mix(in srgb, var(--card-color) 14%, var(--surface3)), var(--surface3) 70%);
     transition:.18s;
   }
-  .type-card .ti{ font-size:19px; color:var(--card-color); opacity:.75; transition:.18s; }
+  .type-card .ti{ font-size:18px; color:var(--card-color); opacity:.75; transition:.18s; }
   .type-label{ font-size:10.5px; font-weight:800; letter-spacing:.05em; color:var(--text); opacity:.85; }
-  .type-sub{ font-size:8.5px; color:var(--text3); letter-spacing:.02em; }
+  .type-sub{ font-size:8.5px; color:var(--text3); letter-spacing:.02em; overflow-wrap:break-word; }
   .type-threshold{ font-size:8.5px; font-weight:700; margin-top:1px; }
 
   .type-card.locked{ cursor:not-allowed; }
@@ -146,7 +147,7 @@
   .type-card.unlocked:not(.selected):hover::before{ opacity:.9; }
 
   /* unlock meter */
-  .meter-wrap{ margin-top:10px; }
+  .meter-wrap{ margin-top:8px; }
   .meter-track{
     position:relative; height:7px; border-radius:99px; background:var(--surface3);
     border:1px solid var(--border2); overflow:hidden;
@@ -157,7 +158,7 @@
     transition:width .5s cubic-bezier(.3,.8,.3,1);
     box-shadow:0 0 12px rgba(168,85,247,.5);
   }
-  .meter-ticks{ display:flex; justify-content:space-between; margin-top:6px; }
+  .meter-ticks{ display:flex; justify-content:space-between; margin-top:4px; }
   .meter-tick{ font-size:8.5px; color:var(--text3); font-weight:600; transition:.2s; }
   .meter-tick.reached{ color:var(--text); }
 
@@ -209,7 +210,7 @@
   /* loyalty row */
   .loyalty-row{
     display:flex; align-items:center; justify-content:space-between;
-    margin:6px 0 18px; padding:11px 13px; border-radius:12px;
+    margin:6px 0 12px; padding:9px 13px; border-radius:12px;
     background:linear-gradient(90deg, rgba(255,176,32,.08), transparent);
     border:1px solid rgba(255,176,32,.22);
   }
@@ -218,7 +219,7 @@
 
   /* submit button with trigger button animation */
   .submit-btn{
-    width:100%; border:none; border-radius:13px; padding:15px; cursor:pointer;
+    width:100%; border:none; border-radius:13px; padding:13px; cursor:pointer;
     font-family:var(--font-mono); font-weight:800; font-size:14px; letter-spacing:.03em;
     color:#04070a; display:flex; align-items:center; justify-content:center; gap:8px;
     background:linear-gradient(100deg,var(--card-color,var(--cyan)),var(--violet) 45%,var(--amber) 85%);
@@ -234,7 +235,7 @@
   .submit-btn:disabled{ opacity:.4; cursor:not-allowed; animation-play-state:paused; box-shadow:none; }
   .submit-btn:not(:disabled):hover{ filter:brightness(1.08); }
 
-  .footer-note{ text-align:center; font-size:9.5px; color:var(--text3); margin-top:16px; line-height:1.6; }
+  .footer-note{ text-align:center; font-size:9.5px; color:var(--text3); margin-top:10px; line-height:1.5; }
   .footer-note a{ color:var(--text2); }
 
   @media (prefers-reduced-motion:reduce){
