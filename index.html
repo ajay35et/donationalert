@@ -15,28 +15,28 @@
     --cyan:#22d3ee; --amber:#ffb020; --violet:#a855f7; --red:#ff3f66;
     --font-head:'Syne',sans-serif; --font-mono:'JetBrains Mono',monospace;
   }
-  *{margin:0;padding:0;box-sizing:border-box;}
-  html,body{height:100%; overflow-x:hidden;}
-  body{
-    background:var(--bg); color:var(--text); font-family:var(--font-mono);
-    overflow-x:hidden;
-    display:flex; align-items:center; justify-content:center;
-    min-height:100dvh;
-    padding:12px;
-    background:
-      radial-gradient(ellipse 900px 500px at 20% -10%, rgba(108,99,255,.14), transparent 60%),
-      radial-gradient(ellipse 700px 500px at 90% 10%, rgba(34,211,238,.08), transparent 60%),
-      var(--bg);
-  }
+ *{margin:0;padding:0;box-sizing:border-box;}
+html,body{height:100%; overflow:hidden;}
+body{
+  background:var(--bg); color:var(--text); font-family:var(--font-mono);
+  display:flex; align-items:center; justify-content:center;
+  height:100dvh;
+  padding:12px;
+  background:
+    radial-gradient(ellipse 900px 500px at 20% -10%, rgba(108,99,255,.14), transparent 60%),
+    radial-gradient(ellipse 700px 500px at 90% 10%, rgba(34,211,238,.08), transparent 60%),
+    var(--bg);
+}
 
-  /* ===== MODAL ===== */
-  .modal{
-    position:relative;
-    width:100%; max-width:420px; max-height:calc(100dvh - 24px); overflow-y:auto; overflow-x:hidden;
-    background:linear-gradient(180deg,var(--surface),var(--surface2) 60%);
-    border-radius:22px; border:1px solid var(--border2);
-    padding:2px;
-  }
+/* ===== MODAL ===== */
+.modal{
+  position:relative;
+  width:100%; max-width:420px;
+  background:linear-gradient(180deg,var(--surface),var(--surface2) 60%);
+  border-radius:22px; border:1px solid var(--border2);
+  padding:2px;
+  transform-origin:top center;
+}
   .modal::-webkit-scrollbar{width:6px;}
   .modal::-webkit-scrollbar-thumb{background:var(--border2); border-radius:6px;}
 
@@ -664,6 +664,31 @@
 
     window.location.href = 'payment.html'; // vercel.json also rewrites /payment → payment.html
   });
+})();
+</script>
+  <script>
+// Auto-fit: if the modal's natural height is taller than the available
+// screen space, scale it down just enough to fit — so it's never taller
+// than the viewport and never needs a scrollbar.
+(function(){
+  var modal = document.querySelector('.modal');
+  if (!modal) return;
+
+  function fit(){
+    modal.style.transform = 'none';
+    var available = window.innerHeight - 24;
+    var natural   = modal.scrollHeight;
+    var scale     = natural > available ? Math.max(available / natural, 0.6) : 1;
+    modal.style.transform = scale < 1 ? 'scale(' + scale.toFixed(3) + ')' : 'none';
+  }
+
+  window.addEventListener('load', fit);
+  window.addEventListener('resize', fit);
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(fit);
+
+  new MutationObserver(fit).observe(modal, { childList: true, subtree: true, characterData: true });
+
+  fit();
 })();
 </script>
 </body>
