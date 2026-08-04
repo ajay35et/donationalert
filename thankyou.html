@@ -36,6 +36,43 @@
                      transition:width .4s ease; width:0%; }
 
     .attempt-txt { font-size:10px; color:#5a5a80; margin-top:6px; }
+
+    /* ===== success celebration: coin drops into piggy bank + side confetti ===== */
+    .celebrate-stage{ position:relative; height:78px; margin-bottom:4px; display:flex; align-items:flex-end; justify-content:center; }
+    .piggy-wrap{ position:relative; width:70px; height:64px; }
+    .piggy{ font-size:52px; line-height:1; display:block; transform-origin:bottom center; animation:piggyIdle 2.4s ease-in-out infinite; }
+    @keyframes piggyIdle{ 0%,100%{ transform:translateY(0) rotate(0deg); } 50%{ transform:translateY(-2px) rotate(-1deg); } }
+    .piggy.landed{ animation:piggyBounce .5s ease; }
+    @keyframes piggyBounce{
+      0%{ transform:scale(1,1); }
+      30%{ transform:scale(1.1,.88); }
+      60%{ transform:scale(.94,1.06); }
+      100%{ transform:scale(1,1); }
+    }
+    .coin{
+      position:absolute; left:50%; top:-70px; font-size:26px;
+      transform:translateX(-50%) rotate(0deg); opacity:0; pointer-events:none;
+    }
+    .coin.drop{ animation:coinDrop .85s cubic-bezier(.55,0,.75,.15) forwards; }
+    @keyframes coinDrop{
+      0%  { top:-70px; opacity:1;  transform:translateX(-50%) rotate(0deg)   scale(1); }
+      70% { top:8px;   opacity:1;  transform:translateX(-50%) rotate(300deg) scale(1); }
+      86% { top:2px;   opacity:1;  transform:translateX(-50%) rotate(340deg) scale(.9); }
+      100%{ top:8px;   opacity:0;  transform:translateX(-50%) rotate(360deg) scale(.35); }
+    }
+
+    .confetti-layer{ position:fixed; inset:0; overflow:hidden; pointer-events:none; z-index:999; }
+    .confetti-piece{
+      position:absolute; width:7px; height:13px; border-radius:2px; opacity:0; top:50%;
+      animation-timing-function:ease-out; animation-fill-mode:forwards; animation-duration:1.5s;
+    }
+    .confetti-piece.cf-left { left:-12px;  animation-name:confettiFly; }
+    .confetti-piece.cf-right{ right:-12px; animation-name:confettiFly; }
+    @keyframes confettiFly{
+      0%  { transform:translate(0,0) rotate(0deg);          opacity:1; }
+      65% { opacity:1; }
+      100%{ transform:translate(var(--tx),var(--ty)) rotate(var(--rot)); opacity:0; }
+    }
   </style>
 </head>
 <body>
@@ -54,7 +91,12 @@
 
   <!-- Success -->
   <div id="state-success" style="display:none">
-    <div class="icon">🎉</div>
+    <div class="celebrate-stage">
+      <div class="piggy-wrap">
+        <div class="coin" id="coin">🪙</div>
+        <div class="piggy" id="piggy">🐷</div>
+      </div>
+    </div>
     <h2 class="success">Tip sent!</h2>
     <p>Your donation will appear on stream shortly.</p>
     <a class="btn" href="/">Send another tip</a>
@@ -72,6 +114,8 @@
     <a class="btn" href="/">Go back</a>
   </div>
 </div>
+
+<div class="confetti-layer" id="confettiLayer"></div>
 
 <script>
 (async () => {
@@ -161,6 +205,39 @@
     document.getElementById('state-success').style.display = state === 'success' ? 'block' : 'none';
     document.getElementById('state-fail').style.display    = state === 'fail'    ? 'block' : 'none';
     if (msg && state === 'fail') document.getElementById('fail-msg').textContent = msg;
+    if (state === 'success') playSuccessAnimation();
+  }
+
+  let celebrationPlayed = false;
+  function playSuccessAnimation(){
+    if (celebrationPlayed) return; // don't re-trigger if show('success') fires more than once
+    celebrationPlayed = true;
+
+    const coin  = document.getElementById('coin');
+    const piggy = document.getElementById('piggy');
+    coin.classList.add('drop');
+    setTimeout(() => piggy.classList.add('landed'), 720);
+
+    // Confetti bursting in from both edges of the screen
+    const layer  = document.getElementById('confettiLayer');
+    const colors = ['#22d3ee', '#a855f7', '#ffb020', '#ff3f66', '#22d382', '#6c63ff'];
+    const centerY = window.innerHeight / 2;
+
+    for (let i = 0; i < 30; i++) {
+      const fromLeft = i % 2 === 0;
+      const piece = document.createElement('div');
+      piece.className = 'confetti-piece ' + (fromLeft ? 'cf-left' : 'cf-right');
+      piece.style.top = (centerY + (Math.random() * 200 - 100)) + 'px';
+      piece.style.background = colors[Math.floor(Math.random() * colors.length)];
+      const tx = (fromLeft ? 1 : -1) * (140 + Math.random() * 200);
+      const ty = -80 + Math.random() * 260;
+      piece.style.setProperty('--tx', tx + 'px');
+      piece.style.setProperty('--ty', ty + 'px');
+      piece.style.setProperty('--rot', (Math.random() * 720 - 360) + 'deg');
+      piece.style.animationDelay = (Math.random() * 0.35) + 's';
+      layer.appendChild(piece);
+      setTimeout(() => piece.remove(), 2400);
+    }
   }
 })();
 </script>
