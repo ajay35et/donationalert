@@ -2,7 +2,7 @@
   "streamer": {
     "name": "AJAY",
     "description": "AJAY Support",
-    "avatarUrl": "discord_fake_avatar_decorations_1751366845149.gif",
+    "avatarUrl": "imgg.webp",
     "status": "LIVE",
     "showStatus": true
   },
@@ -30,7 +30,7 @@
       "icon": "mic",
       "color": "#ffb020",
       "colorDim": "#4a3208",
-      "minAmount": 300,
+      "minAmount": 500,
       "loyaltyPointsPer100": 8
     },
     {
@@ -40,7 +40,7 @@
       "icon": "image",
       "color": "#a855f7",
       "colorDim": "#2f1a45",
-      "minAmount": 400,
+      "minAmount": 900,
       "loyaltyPointsPer100": 12
     }
   ],
