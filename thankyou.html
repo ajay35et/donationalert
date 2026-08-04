@@ -9,18 +9,17 @@
            display:flex; align-items:center; justify-content:center; min-height:100vh; margin:0; }
     .card { background:#09090f; border:1px solid #1c1c2e; border-radius:16px;
             padding:32px 28px; text-align:center; max-width:360px; width:90%; }
-    .icon { font-size:40px; margin-bottom:12px; }
     h2    { font-size:18px; margin:0 0 8px; }
     p     { font-size:12px; color:#9090b8; margin:0 0 20px; line-height:1.6; }
 
     .spinner { width:28px; height:28px; border:3px solid rgba(108,99,255,.2);
                border-top-color:#6c63ff; border-radius:50%;
-               animation:spin .7s linear infinite; margin:0 auto 16px; }
+               animation:spin .7s linear infinite; margin:0 auto 16px; display:none; }
     @keyframes spin { to { transform:rotate(360deg); } }
 
     .btn { display:inline-block; background:#6c63ff; color:#fff; border:none;
            border-radius:10px; padding:10px 24px; font-size:13px; font-weight:700;
-           cursor:pointer; text-decoration:none; font-family:inherit; }
+           cursor:pointer; text-decoration:none; font-family:inherit; margin:4px; }
 
     .success { color:#22d382; }
     .error   { color:#ff3f3f; }
@@ -37,28 +36,106 @@
 
     .attempt-txt { font-size:10px; color:#5a5a80; margin-top:6px; }
 
-    /* ===== success celebration: coin drops into piggy bank + side confetti ===== */
-    .celebrate-stage{ position:relative; height:78px; margin-bottom:4px; display:flex; align-items:flex-end; justify-content:center; }
-    .piggy-wrap{ position:relative; width:70px; height:64px; }
-    .piggy{ font-size:52px; line-height:1; display:block; transform-origin:bottom center; animation:piggyIdle 2.4s ease-in-out infinite; }
-    @keyframes piggyIdle{ 0%,100%{ transform:translateY(0) rotate(0deg); } 50%{ transform:translateY(-2px) rotate(-1deg); } }
-    .piggy.landed{ animation:piggyBounce .5s ease; }
+    /* ============ STAGE (shared) ============ */
+    .stage{ position:relative; height:150px; margin-bottom:6px; display:flex;
+            align-items:flex-end; justify-content:center; }
+    .piggy-wrap{ position:relative; width:170px; height:140px; }
+    .piggy-svg{ width:100%; height:100%; display:block; transform-origin:50% 90%; }
+
+    /* idle sway for pending */
+    .piggy-idle{ animation:piggyIdle 2.2s ease-in-out infinite; }
+    @keyframes piggyIdle{
+      0%,100%{ transform:translateY(0) rotate(0deg); }
+      50%{ transform:translateY(-3px) rotate(-1.5deg); }
+    }
+
+    /* success bounce */
+    .piggy-landed{ animation:piggyBounce .55s ease; }
     @keyframes piggyBounce{
       0%{ transform:scale(1,1); }
-      30%{ transform:scale(1.1,.88); }
-      60%{ transform:scale(.94,1.06); }
+      30%{ transform:scale(1.12,.86); }
+      60%{ transform:scale(.93,1.08); }
       100%{ transform:scale(1,1); }
     }
-    .coin{
-      position:absolute; left:50%; top:-70px; font-size:26px;
-      transform:translateX(-50%) rotate(0deg); opacity:0; pointer-events:none;
+
+    /* fail droop */
+    .piggy-droop{ animation:piggyDroop .6s ease forwards; }
+    @keyframes piggyDroop{
+      0%{ transform:translateY(0) rotate(0deg); }
+      45%{ transform:translateY(3px) rotate(-4deg); }
+      100%{ transform:translateY(4px) rotate(-3deg); }
     }
-    .coin.drop{ animation:coinDrop .85s cubic-bezier(.55,0,.75,.15) forwards; }
-    @keyframes coinDrop{
-      0%  { top:-70px; opacity:1;  transform:translateX(-50%) rotate(0deg)   scale(1); }
-      70% { top:8px;   opacity:1;  transform:translateX(-50%) rotate(300deg) scale(1); }
-      86% { top:2px;   opacity:1;  transform:translateX(-50%) rotate(340deg) scale(.9); }
-      100%{ top:8px;   opacity:0;  transform:translateX(-50%) rotate(360deg) scale(.35); }
+
+    /* sweat drop for pending (tired/angry) */
+    .sweat{ position:absolute; top:14px; left:60%; font-size:14px; opacity:0; }
+    .sweat.show{ animation:sweatDrop 1.8s ease-in-out infinite; }
+    @keyframes sweatDrop{
+      0%{ opacity:0; transform:translateY(-4px); }
+      20%{ opacity:1; }
+      70%{ opacity:1; transform:translateY(14px); }
+      100%{ opacity:0; transform:translateY(20px); }
+    }
+
+    /* coin */
+    .coin{ position:absolute; left:50%; top:-90px; width:34px; height:34px;
+           transform:translateX(-50%) rotate(0deg); opacity:0; pointer-events:none; }
+    .coin.drop-in{ animation:coinDropIn .8s cubic-bezier(.55,0,.75,.15) forwards; }
+    @keyframes coinDropIn{
+      0%  { top:-90px; opacity:1; transform:translateX(-50%) rotate(0deg)   scale(1); }
+      68% { top:18px;  opacity:1; transform:translateX(-50%) rotate(300deg) scale(1); }
+      84% { top:10px;  opacity:1; transform:translateX(-50%) rotate(340deg) scale(.85); }
+      100%{ top:14px;  opacity:0; transform:translateX(-50%) rotate(360deg) scale(.3); }
+    }
+    .coin.drop-steal{ animation:coinDropSteal .5s cubic-bezier(.55,0,.75,.15) forwards; }
+    @keyframes coinDropSteal{
+      0%  { top:-90px; opacity:1; transform:translateX(-50%) rotate(0deg)   scale(1); }
+      100%{ top:2px;   opacity:1; transform:translateX(-50%) rotate(200deg) scale(1); }
+    }
+    .coin.stolen{ transition:opacity .15s ease, transform .5s cubic-bezier(.3,.8,.4,1);
+                  transform:translate(60px,-90px) rotate(420deg) scale(.6); opacity:0; }
+
+    /* grabbing hand */
+    .hand{ position:absolute; left:65%; top:-70px; width:56px; height:56px;
+           transform:translateX(-50%) translateY(-14px) rotate(-25deg) scale(.6);
+           opacity:0; pointer-events:none; }
+    .hand.grab{ animation:handGrab .45s ease .38s forwards; }
+    @keyframes handGrab{
+      0%{ opacity:0; top:-70px; transform:translateX(-50%) translateY(-14px) rotate(-25deg) scale(.6); }
+      55%{ opacity:1; top:-4px; transform:translateX(-50%) translateY(0) rotate(-4deg) scale(1); }
+      100%{ opacity:1; top:-14px; transform:translateX(-50%) translateY(-10px) rotate(14deg) scale(1); }
+    }
+    .hand.retreat{ animation:handRetreat .55s ease .05s forwards; }
+    @keyframes handRetreat{
+      0%{ top:-14px; opacity:1; transform:translateX(-50%) translateY(-10px) rotate(14deg) scale(1); }
+      100%{ top:-90px; opacity:0; transform:translateX(-50%) translateY(-40px) rotate(30deg) scale(.7); }
+    }
+
+    /* FAILED stamp asset */
+    .fail-stamp{ position:absolute; top:-4px; left:50%; width:78px;
+                 transform:translateX(-50%) rotate(-12deg) scale(0); opacity:0; pointer-events:none; }
+    .fail-stamp.show{ animation:stampSlam .4s cubic-bezier(.34,1.56,.64,1) .78s forwards; }
+    @keyframes stampSlam{
+      0%{ transform:translateX(-50%) rotate(-12deg) scale(2.2); opacity:0; }
+      60%{ transform:translateX(-50%) rotate(-12deg) scale(.85); opacity:1; }
+      100%{ transform:translateX(-50%) rotate(-12deg) scale(1); opacity:1; }
+    }
+
+    /* tear */
+    .tear{ position:absolute; opacity:0; }
+    .tear.drop{ animation:tearFall 1.2s ease-in .85s forwards; }
+    @keyframes tearFall{
+      0%{ opacity:0; transform:translateY(0); }
+      15%{ opacity:1; }
+      100%{ opacity:0; transform:translateY(26px); }
+    }
+
+    /* sparkles for success */
+    .sparkle{ position:absolute; opacity:0; }
+    .sparkle.show{ animation:sparklePop .9s ease .7s forwards; }
+    @keyframes sparklePop{
+      0%{ opacity:0; transform:scale(.2) rotate(0deg); }
+      40%{ opacity:1; transform:scale(1.1) rotate(90deg); }
+      100%{ opacity:0; transform:scale(.5) rotate(180deg); }
     }
 
     .confetti-layer{ position:fixed; inset:0; overflow:hidden; pointer-events:none; z-index:999; }
@@ -73,68 +150,40 @@
       65% { opacity:1; }
       100%{ transform:translate(var(--tx),var(--ty)) rotate(var(--rot)); opacity:0; }
     }
-
-    /* ===== fail: hand intercepts + grabs the coin, piggy bank goes sad ===== */
-    .fail-stage{ position:relative; height:78px; margin-bottom:4px; display:flex; align-items:flex-end; justify-content:center; }
-    .fail-piggy-wrap{ position:relative; width:84px; height:64px; }
-
-    .sad-piggy{
-      font-size:52px; line-height:1; display:block; transform-origin:bottom center;
-      filter:grayscale(.6) brightness(.82);
-    }
-    .sad-piggy.droop{ animation:piggyDroop .6s ease forwards; }
-    @keyframes piggyDroop{
-      0%  { transform:translateY(0)  rotate(0deg); }
-      40% { transform:translateY(2px) rotate(-5deg); }
-      100%{ transform:translateY(3px) rotate(-4deg); }
-    }
-    .tear{ position:absolute; left:36%; top:18px; font-size:11px; opacity:0; }
-    .tear.drop{ animation:tearFall 1.1s ease-in .3s forwards; }
-    @keyframes tearFall{
-      0% { opacity:0; top:18px; }
-      18%{ opacity:1; }
-      100%{ opacity:0; top:44px; }
-    }
-
-    #failCoin.drop{ animation:coinDropShort .5s cubic-bezier(.55,0,.75,.15) forwards; }
-    @keyframes coinDropShort{
-      0%  { top:-70px; opacity:1; transform:translateX(-50%) rotate(0deg)   scale(1); }
-      100%{ top:0px;   opacity:1; transform:translateX(-50%) rotate(220deg) scale(1); }
-    }
-    #failCoin.grabbed{ transition:opacity .18s ease, transform .18s ease; opacity:0 !important; transform:translateX(-50%) translateY(-6px) scale(.6) !important; }
-
-    .hand{
-      position:absolute; left:50%; top:-40px; font-size:30px;
-      transform:translateX(-50%) translateY(-10px) rotate(-18deg); opacity:0; pointer-events:none;
-    }
-    .hand.grab{ animation:handGrab .5s ease .42s forwards; }
-    @keyframes handGrab{
-      0%  { opacity:0; top:-40px; transform:translateX(-50%) translateY(-10px) rotate(-18deg); }
-      60% { opacity:1; top:-6px;  transform:translateX(-50%) translateY(0)     rotate(0deg); }
-      100%{ opacity:1; top:-12px; transform:translateX(-50%) translateY(-6px)  rotate(12deg); }
-    }
-
-    .no-badge{
-      position:absolute; left:50%; top:-2px; font-size:24px; font-weight:900; color:#ff3f3f;
-      transform:translateX(-50%) scale(0); opacity:0; text-shadow:0 0 10px rgba(255,63,63,.6);
-    }
-    .no-badge.show{ animation:noPop .45s cubic-bezier(.34,1.56,.64,1) .95s forwards; }
-    @keyframes noPop{
-      0% { transform:translateX(-50%) scale(0);            opacity:0; }
-      60%{ transform:translateX(-50%) scale(1.25);          opacity:1; }
-      80%{ transform:translateX(-50%) scale(.9) rotate(-6deg); }
-      100%{ transform:translateX(-50%) scale(1) rotate(0deg); opacity:1; }
-    }
   </style>
 </head>
 <body>
 <div class="card">
-  <!-- TEST MODE badge injected by JS if needed -->
   <div id="test-mode-badge" style="display:none"></div>
 
   <!-- Pending -->
   <div id="state-pending">
-    <div class="spinner"></div>
+    <div class="stage">
+      <div class="piggy-wrap">
+        <svg class="piggy-svg piggy-idle" viewBox="0 0 200 180" xmlns="http://www.w3.org/2000/svg">
+          <ellipse cx="100" cy="118" rx="20" ry="9" fill="#000" opacity=".18"/>
+          <path d="M60 55 Q45 30 60 38 Q70 42 66 58 Z" fill="#f28ba3" stroke="#d16b85" stroke-width="2.5"/>
+          <path d="M140 55 Q155 30 140 38 Q130 42 134 58 Z" fill="#f28ba3" stroke="#d16b85" stroke-width="2.5"/>
+          <rect x="55" y="150" width="14" height="20" rx="6" fill="#f4a0b6" stroke="#d16b85" stroke-width="2.5"/>
+          <rect x="130" y="150" width="14" height="20" rx="6" fill="#f4a0b6" stroke="#d16b85" stroke-width="2.5"/>
+          <rect x="72" y="150" width="14" height="18" rx="6" fill="#f4a0b6" stroke="#d16b85" stroke-width="2.5"/>
+          <rect x="114" y="150" width="14" height="18" rx="6" fill="#f4a0b6" stroke="#d16b85" stroke-width="2.5"/>
+          <path d="M168 95 Q182 85 175 75 Q170 82 178 88" fill="none" stroke="#d16b85" stroke-width="4" stroke-linecap="round"/>
+          <ellipse cx="100" cy="105" rx="72" ry="52" fill="#f9b6c8" stroke="#d16b85" stroke-width="3"/>
+          <rect x="86" y="52" width="28" height="9" rx="4" fill="#7a4a55" transform="rotate(-4 100 56)"/>
+          <ellipse cx="100" cy="128" rx="26" ry="17" fill="#f9c9d6" stroke="#d16b85" stroke-width="2.5"/>
+          <ellipse cx="91" cy="128" rx="3.5" ry="5" fill="#c26e83"/>
+          <ellipse cx="109" cy="128" rx="3.5" ry="5" fill="#c26e83"/>
+          <path d="M74 90 Q80 80 90 87" fill="none" stroke="#8a4a58" stroke-width="4" stroke-linecap="round"/>
+          <path d="M126 90 Q120 80 110 87" fill="none" stroke="#8a4a58" stroke-width="4" stroke-linecap="round"/>
+          <path d="M76 96 Q84 92 92 96" fill="none" stroke="#5a2e38" stroke-width="4.5" stroke-linecap="round"/>
+          <path d="M124 96 Q116 92 108 96" fill="none" stroke="#5a2e38" stroke-width="4.5" stroke-linecap="round"/>
+          <path d="M85 112 Q100 106 115 112" fill="none" stroke="#8a4a58" stroke-width="4" stroke-linecap="round"/>
+          <circle class="sweat show" cx="150" cy="80" r="5" fill="#7dd3fc"/>
+        </svg>
+      </div>
+    </div>
+    <div class="spinner" style="display:block"></div>
     <h2>Verifying payment…</h2>
     <p>Please wait while we confirm your payment.<br>This usually takes a few seconds.</p>
     <div class="progress-wrap"><div class="progress-bar" id="progress-bar"></div></div>
@@ -143,10 +192,41 @@
 
   <!-- Success -->
   <div id="state-success" style="display:none">
-    <div class="celebrate-stage">
+    <div class="stage">
       <div class="piggy-wrap">
-        <div class="coin" id="coin">🪙</div>
-        <div class="piggy" id="piggy">🐷</div>
+        <svg class="coin" id="coin" viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
+          <defs><radialGradient id="goldGrad" cx="35%" cy="30%" r="75%">
+            <stop offset="0%" stop-color="#fff6c8"/><stop offset="45%" stop-color="#ffd54a"/>
+            <stop offset="100%" stop-color="#e08c00"/>
+          </radialGradient></defs>
+          <circle cx="20" cy="20" r="18" fill="url(#goldGrad)" stroke="#b8710a" stroke-width="2"/>
+          <circle cx="20" cy="20" r="13" fill="none" stroke="#e0a422" stroke-width="1.5"/>
+          <text x="20" y="26" font-size="16" font-weight="900" text-anchor="middle" fill="#b8710a" font-family="Georgia,serif">₹</text>
+        </svg>
+        <svg class="sparkle" id="spark1" style="left:22px; top:6px; width:20px;" viewBox="0 0 24 24"><path d="M12 0l2.5 8.5L23 11l-8.5 2.5L12 22l-2.5-8.5L1 11l8.5-2.5z" fill="#ffe066"/></svg>
+        <svg class="sparkle" id="spark2" style="right:14px; top:20px; width:14px;" viewBox="0 0 24 24"><path d="M12 0l2.5 8.5L23 11l-8.5 2.5L12 22l-2.5-8.5L1 11l8.5-2.5z" fill="#7dd3fc"/></svg>
+        <svg class="piggy-svg" id="piggyHappy" viewBox="0 0 200 180" xmlns="http://www.w3.org/2000/svg">
+          <ellipse cx="100" cy="118" rx="20" ry="9" fill="#000" opacity=".18"/>
+          <path d="M60 55 Q45 30 60 38 Q70 42 66 58 Z" fill="#f28ba3" stroke="#d16b85" stroke-width="2.5"/>
+          <path d="M140 55 Q155 30 140 38 Q130 42 134 58 Z" fill="#f28ba3" stroke="#d16b85" stroke-width="2.5"/>
+          <rect x="55" y="150" width="14" height="20" rx="6" fill="#f4a0b6" stroke="#d16b85" stroke-width="2.5"/>
+          <rect x="130" y="150" width="14" height="20" rx="6" fill="#f4a0b6" stroke="#d16b85" stroke-width="2.5"/>
+          <rect x="72" y="150" width="14" height="18" rx="6" fill="#f4a0b6" stroke="#d16b85" stroke-width="2.5"/>
+          <rect x="114" y="150" width="14" height="18" rx="6" fill="#f4a0b6" stroke="#d16b85" stroke-width="2.5"/>
+          <path d="M168 95 Q184 82 174 74 Q180 84 168 88" fill="none" stroke="#d16b85" stroke-width="4" stroke-linecap="round"/>
+          <ellipse cx="100" cy="105" rx="72" ry="52" fill="#ffc2d4" stroke="#d16b85" stroke-width="3"/>
+          <rect x="86" y="52" width="28" height="9" rx="4" fill="#7a4a55" transform="rotate(-4 100 56)"/>
+          <ellipse cx="100" cy="128" rx="26" ry="17" fill="#ffd7e2" stroke="#d16b85" stroke-width="2.5"/>
+          <ellipse cx="91" cy="128" rx="3.5" ry="5" fill="#c26e83"/>
+          <ellipse cx="109" cy="128" rx="3.5" ry="5" fill="#c26e83"/>
+          <ellipse cx="72" cy="112" rx="9" ry="6" fill="#ff9db8" opacity=".7"/>
+          <ellipse cx="128" cy="112" rx="9" ry="6" fill="#ff9db8" opacity=".7"/>
+          <path d="M73 88 Q80 76 92 86" fill="none" stroke="#8a4a58" stroke-width="4" stroke-linecap="round"/>
+          <path d="M127 88 Q120 76 108 86" fill="none" stroke="#8a4a58" stroke-width="4" stroke-linecap="round"/>
+          <path d="M73 95 Q80 87 87 95" fill="none" stroke="#5a2e38" stroke-width="4.5" stroke-linecap="round"/>
+          <path d="M127 95 Q120 87 113 95" fill="none" stroke="#5a2e38" stroke-width="4.5" stroke-linecap="round"/>
+          <path d="M82 110 Q100 124 118 110" fill="none" stroke="#8a4a58" stroke-width="5" stroke-linecap="round"/>
+        </svg>
       </div>
     </div>
     <h2 class="success">Tip sent!</h2>
@@ -158,13 +238,51 @@
 
   <!-- Failed / timed out -->
   <div id="state-fail" style="display:none">
-    <div class="fail-stage">
-      <div class="fail-piggy-wrap">
-        <div class="coin" id="failCoin">🪙</div>
-        <div class="hand" id="grabHand">✋</div>
-        <div class="no-badge" id="noBadge">✕</div>
-        <div class="sad-piggy" id="sadPiggy">🐷</div>
-        <div class="tear" id="tear">💧</div>
+    <div class="stage">
+      <div class="piggy-wrap">
+        <svg class="coin" id="failCoin" viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
+          <defs><radialGradient id="goldGrad2" cx="35%" cy="30%" r="75%">
+            <stop offset="0%" stop-color="#fff6c8"/><stop offset="45%" stop-color="#ffd54a"/>
+            <stop offset="100%" stop-color="#e08c00"/>
+          </radialGradient></defs>
+          <circle cx="20" cy="20" r="18" fill="url(#goldGrad2)" stroke="#b8710a" stroke-width="2"/>
+          <circle cx="20" cy="20" r="13" fill="none" stroke="#e0a422" stroke-width="1.5"/>
+          <text x="20" y="26" font-size="16" font-weight="900" text-anchor="middle" fill="#b8710a" font-family="Georgia,serif">₹</text>
+        </svg>
+        <svg class="hand" id="grabHand" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg">
+          <path d="M22 58 C14 50 12 40 14 30 C15 24 18 18 20 14 C21 12 24 12 24.5 15 C25 20 24 26 24 26
+                    C24 20 25 12 26.5 9 C27.5 7 30.5 7.5 30.5 10.5 C30.5 16 30 24 30 24
+                    C30 17 31.5 10 33.5 8 C35 6.5 38 7.5 37.5 10.5 C37 16 36 24 36 24
+                    C36.5 18 39 13 41 12.5 C43 12 45 14 44 17 C42 24 40 30 40 34
+                    C40 34 46 30 48 32 C50 34 47 40 42 46 C36 53 30 58 22 58 Z"
+                fill="#f2b98a" stroke="#c8875a" stroke-width="2" stroke-linejoin="round"/>
+          <path d="M20 40 Q26 44 32 40" fill="none" stroke="#c8875a" stroke-width="1.5" opacity=".6"/>
+        </svg>
+        <svg class="fail-stamp" id="failStamp" viewBox="0 0 100 60" xmlns="http://www.w3.org/2000/svg">
+          <rect x="2" y="2" width="96" height="56" rx="8" fill="none" stroke="#ff3f3f" stroke-width="5"/>
+          <text x="50" y="38" font-size="22" font-weight="900" text-anchor="middle" fill="#ff3f3f" font-family="Arial,sans-serif">FAILED</text>
+        </svg>
+        <svg class="tear" id="tear" style="left:78px; top:88px; width:11px;" viewBox="0 0 24 24"><path d="M12 2 C12 2 5 12 5 17 A7 7 0 0 0 19 17 C19 12 12 2 12 2Z" fill="#7dd3fc"/></svg>
+        <svg class="piggy-svg" id="piggySad" viewBox="0 0 200 180" xmlns="http://www.w3.org/2000/svg">
+          <ellipse cx="100" cy="118" rx="20" ry="9" fill="#000" opacity=".18"/>
+          <path d="M60 55 Q45 32 58 40 Q66 45 63 58 Z" fill="#e7a3b3" stroke="#b3697b" stroke-width="2.5"/>
+          <path d="M140 55 Q155 32 142 40 Q134 45 137 58 Z" fill="#e7a3b3" stroke="#b3697b" stroke-width="2.5"/>
+          <rect x="55" y="150" width="14" height="20" rx="6" fill="#eaadbc" stroke="#b3697b" stroke-width="2.5"/>
+          <rect x="130" y="150" width="14" height="20" rx="6" fill="#eaadbc" stroke="#b3697b" stroke-width="2.5"/>
+          <rect x="72" y="150" width="14" height="18" rx="6" fill="#eaadbc" stroke="#b3697b" stroke-width="2.5"/>
+          <rect x="114" y="150" width="14" height="18" rx="6" fill="#eaadbc" stroke="#b3697b" stroke-width="2.5"/>
+          <path d="M168 98 Q178 92 172 86" fill="none" stroke="#b3697b" stroke-width="4" stroke-linecap="round"/>
+          <ellipse cx="100" cy="108" rx="72" ry="52" fill="#e3aebb" stroke="#b3697b" stroke-width="3"/>
+          <rect x="86" y="55" width="28" height="9" rx="4" fill="#6a4048" transform="rotate(-4 100 59)"/>
+          <ellipse cx="100" cy="130" rx="26" ry="17" fill="#e9c0cb" stroke="#b3697b" stroke-width="2.5"/>
+          <ellipse cx="91" cy="130" rx="3.5" ry="5" fill="#a25e6f"/>
+          <ellipse cx="109" cy="130" rx="3.5" ry="5" fill="#a25e6f"/>
+          <path d="M74 92 Q82 98 92 94" fill="none" stroke="#6e4048" stroke-width="4" stroke-linecap="round"/>
+          <path d="M126 92 Q118 98 108 94" fill="none" stroke="#6e4048" stroke-width="4" stroke-linecap="round"/>
+          <circle cx="82" cy="102" r="4.5" fill="#3a2226"/>
+          <circle cx="118" cy="102" r="4.5" fill="#3a2226"/>
+          <path d="M85 122 Q100 114 115 122" fill="none" stroke="#6e4048" stroke-width="4.5" stroke-linecap="round"/>
+        </svg>
       </div>
     </div>
     <h2 class="error">Payment not confirmed</h2>
@@ -183,7 +301,6 @@
   const order_id = params.get('order_id');
   const provider = params.get('provider') || 'cashfree';
 
-  // TEST MODE badge
   const prodMode = '{{PRODUCTION_MODE}}';
   if (prodMode !== 'true' && prodMode !== '{{PRODUCTION_MODE}}') {
     const badge = document.getElementById('test-mode-badge');
@@ -196,9 +313,8 @@
     return;
   }
 
-  // Poll every 3 seconds for up to 5 minutes (100 attempts)
   const INTERVAL_MS  = 3000;
-  const MAX_DURATION = 5 * 60 * 1000;   // 5 min
+  const MAX_DURATION = 5 * 60 * 1000;
   const startTime    = Date.now();
   let   attempt      = 0;
 
@@ -207,14 +323,11 @@
 
   async function poll() {
     const elapsed = Date.now() - startTime;
-
-    // Update progress bar
     const pct = Math.min(100, (elapsed / MAX_DURATION) * 100);
     progressBar.style.width = pct + '%';
     attempt++;
     attemptTxt.textContent = `Attempt ${attempt} · ${Math.floor(elapsed / 1000)}s elapsed`;
 
-    // Time is up
     if (elapsed >= MAX_DURATION) {
       show('fail', 'Payment not confirmed within 5 minutes. Order ID: ' + order_id);
       document.getElementById('fail-order').textContent = 'Order ID: ' + order_id;
@@ -247,17 +360,14 @@
         return;
       }
 
-      // Still pending — schedule next poll
       setTimeout(poll, INTERVAL_MS);
 
     } catch (err) {
       console.warn('[thankyou] poll error:', err.message);
-      // Network blip — retry
       setTimeout(poll, INTERVAL_MS);
     }
   }
 
-  // First poll after a short delay so the payment provider has time to process
   setTimeout(poll, 1500);
 
   function show(state, msg) {
@@ -269,37 +379,74 @@
     if (state === 'fail')    playFailAnimation();
   }
 
+  // ===== sounds (Web Audio, no external files needed) =====
+  function playSuccessSound(){
+    try {
+      const ctx = new (window.AudioContext || window.webkitAudioContext)();
+      const now = ctx.currentTime;
+      [523.25, 659.25, 783.99].forEach((f, i) => {
+        const o = ctx.createOscillator(), g = ctx.createGain();
+        o.type = 'sine'; o.frequency.value = f;
+        o.connect(g); g.connect(ctx.destination);
+        const t = now + i * 0.11;
+        g.gain.setValueAtTime(0, t);
+        g.gain.linearRampToValueAtTime(0.28, t + 0.02);
+        g.gain.exponentialRampToValueAtTime(0.001, t + 0.3);
+        o.start(t); o.stop(t + 0.32);
+      });
+    } catch (e) {}
+  }
+  function playFailSound(){
+    try {
+      const ctx = new (window.AudioContext || window.webkitAudioContext)();
+      const now = ctx.currentTime;
+      const o = ctx.createOscillator(), g = ctx.createGain();
+      o.type = 'sawtooth';
+      o.frequency.setValueAtTime(220, now);
+      o.frequency.exponentialRampToValueAtTime(90, now + 0.45);
+      g.gain.setValueAtTime(0.22, now);
+      g.gain.exponentialRampToValueAtTime(0.001, now + 0.5);
+      o.connect(g); g.connect(ctx.destination);
+      o.start(now); o.stop(now + 0.5);
+    } catch (e) {}
+  }
+
   let failAnimationPlayed = false;
   function playFailAnimation(){
-    if (failAnimationPlayed) return; // don't re-trigger if show('fail') fires more than once
+    if (failAnimationPlayed) return;
     failAnimationPlayed = true;
 
     const coin  = document.getElementById('failCoin');
     const hand  = document.getElementById('grabHand');
-    const badge = document.getElementById('noBadge');
-    const piggy = document.getElementById('sadPiggy');
+    const stamp = document.getElementById('failStamp');
+    const piggy = document.getElementById('piggySad');
     const tear  = document.getElementById('tear');
 
-    coin.classList.add('drop');
+    coin.classList.add('drop-steal');
     hand.classList.add('grab');
-    badge.classList.add('show');
+    playFailSound();
 
-    // the hand "catches" the coin mid-air right as it reaches grab position
-    setTimeout(() => coin.classList.add('grabbed'), 500);
-    setTimeout(() => { piggy.classList.add('droop'); tear.classList.add('drop'); }, 560);
+    setTimeout(() => coin.classList.add('stolen'), 480);
+    setTimeout(() => hand.classList.add('retreat'), 500);
+    setTimeout(() => stamp.classList.add('show'), 0);
+    setTimeout(() => { piggy.parentElement.classList.add('piggy-droop'); tear.classList.add('drop'); }, 560);
   }
 
   let celebrationPlayed = false;
   function playSuccessAnimation(){
-    if (celebrationPlayed) return; // don't re-trigger if show('success') fires more than once
+    if (celebrationPlayed) return;
     celebrationPlayed = true;
 
     const coin  = document.getElementById('coin');
-    const piggy = document.getElementById('piggy');
-    coin.classList.add('drop');
-    setTimeout(() => piggy.classList.add('landed'), 720);
+    const piggy = document.getElementById('piggyHappy');
+    coin.classList.add('drop-in');
+    playSuccessSound();
+    setTimeout(() => piggy.parentElement.classList.add('piggy-landed'), 680);
+    setTimeout(() => {
+      document.getElementById('spark1').classList.add('show');
+      document.getElementById('spark2').classList.add('show');
+    }, 700);
 
-    // Confetti bursting in from both edges of the screen
     const layer  = document.getElementById('confettiLayer');
     const colors = ['#22d3ee', '#a855f7', '#ffb020', '#ff3f66', '#22d382', '#6c63ff'];
     const centerY = window.innerHeight / 2;
