@@ -37,10 +37,10 @@
     .attempt-txt { font-size:10px; color:#5a5a80; margin-top:6px; }
 
     /* ============ STAGE (shared) ============ */
-    .stage{ position:relative; height:150px; margin-bottom:6px; display:flex;
+    .stage{ position:relative; height:158px; margin-bottom:6px; display:flex;
             align-items:flex-end; justify-content:center; }
-    .piggy-wrap{ position:relative; width:170px; height:140px; }
-    .piggy-svg{ width:100%; height:100%; display:block; transform-origin:50% 90%; }
+    .piggy-wrap{ position:relative; width:170px; height:150px; }
+    .piggy-svg{ width:100%; height:100%; display:block; transform-origin:50% 92%; overflow:visible; }
 
     /* idle sway for pending */
     .piggy-idle{ animation:piggyIdle 2.2s ease-in-out infinite; }
@@ -53,8 +53,8 @@
     .piggy-landed{ animation:piggyBounce .55s ease; }
     @keyframes piggyBounce{
       0%{ transform:scale(1,1); }
-      30%{ transform:scale(1.12,.86); }
-      60%{ transform:scale(.93,1.08); }
+      30%{ transform:scale(1.1,.88); }
+      60%{ transform:scale(.94,1.06); }
       100%{ transform:scale(1,1); }
     }
 
@@ -66,8 +66,25 @@
       100%{ transform:translateY(4px) rotate(-3deg); }
     }
 
+    /* ---- ear wiggle: continuous, both ears alternate ---- */
+    .ear{ transform-box: fill-box; transform-origin: 50% 100%; }
+    .ear-l{ animation: earWiggleL 2.6s ease-in-out infinite; }
+    .ear-r{ animation: earWiggleR 2.6s ease-in-out infinite; animation-delay:.35s; }
+    @keyframes earWiggleL{
+      0%,100%{ transform:rotate(0deg); }
+      25%{ transform:rotate(-10deg); }
+      50%{ transform:rotate(2deg); }
+      75%{ transform:rotate(-6deg); }
+    }
+    @keyframes earWiggleR{
+      0%,100%{ transform:rotate(0deg); }
+      25%{ transform:rotate(9deg); }
+      50%{ transform:rotate(-2deg); }
+      75%{ transform:rotate(6deg); }
+    }
+
     /* sweat drop for pending (tired/angry) */
-    .sweat{ position:absolute; top:14px; left:60%; font-size:14px; opacity:0; }
+    .sweat{ position:absolute; top:22px; left:64%; font-size:14px; opacity:0; }
     .sweat.show{ animation:sweatDrop 1.8s ease-in-out infinite; }
     @keyframes sweatDrop{
       0%{ opacity:0; transform:translateY(-4px); }
@@ -82,14 +99,14 @@
     .coin.drop-in{ animation:coinDropIn .8s cubic-bezier(.55,0,.75,.15) forwards; }
     @keyframes coinDropIn{
       0%  { top:-90px; opacity:1; transform:translateX(-50%) rotate(0deg)   scale(1); }
-      68% { top:18px;  opacity:1; transform:translateX(-50%) rotate(300deg) scale(1); }
-      84% { top:10px;  opacity:1; transform:translateX(-50%) rotate(340deg) scale(.85); }
-      100%{ top:14px;  opacity:0; transform:translateX(-50%) rotate(360deg) scale(.3); }
+      68% { top:26px;  opacity:1; transform:translateX(-50%) rotate(300deg) scale(1); }
+      84% { top:18px;  opacity:1; transform:translateX(-50%) rotate(340deg) scale(.85); }
+      100%{ top:22px;  opacity:0; transform:translateX(-50%) rotate(360deg) scale(.3); }
     }
     .coin.drop-steal{ animation:coinDropSteal .5s cubic-bezier(.55,0,.75,.15) forwards; }
     @keyframes coinDropSteal{
       0%  { top:-90px; opacity:1; transform:translateX(-50%) rotate(0deg)   scale(1); }
-      100%{ top:2px;   opacity:1; transform:translateX(-50%) rotate(200deg) scale(1); }
+      100%{ top:10px;  opacity:1; transform:translateX(-50%) rotate(200deg) scale(1); }
     }
     .coin.stolen{ transition:opacity .15s ease, transform .5s cubic-bezier(.3,.8,.4,1);
                   transform:translate(60px,-90px) rotate(420deg) scale(.6); opacity:0; }
@@ -111,7 +128,7 @@
     }
 
     /* FAILED stamp asset */
-    .fail-stamp{ position:absolute; top:-4px; left:50%; width:78px;
+    .fail-stamp{ position:absolute; top:2px; left:50%; width:78px;
                  transform:translateX(-50%) rotate(-12deg) scale(0); opacity:0; pointer-events:none; }
     .fail-stamp.show{ animation:stampSlam .4s cubic-bezier(.34,1.56,.64,1) .78s forwards; }
     @keyframes stampSlam{
@@ -160,26 +177,26 @@
   <div id="state-pending">
     <div class="stage">
       <div class="piggy-wrap">
-        <svg class="piggy-svg piggy-idle" viewBox="0 0 200 180" xmlns="http://www.w3.org/2000/svg">
-          <ellipse cx="100" cy="118" rx="20" ry="9" fill="#000" opacity=".18"/>
-          <path d="M60 55 Q45 30 60 38 Q70 42 66 58 Z" fill="#f28ba3" stroke="#d16b85" stroke-width="2.5"/>
-          <path d="M140 55 Q155 30 140 38 Q130 42 134 58 Z" fill="#f28ba3" stroke="#d16b85" stroke-width="2.5"/>
-          <rect x="55" y="150" width="14" height="20" rx="6" fill="#f4a0b6" stroke="#d16b85" stroke-width="2.5"/>
-          <rect x="130" y="150" width="14" height="20" rx="6" fill="#f4a0b6" stroke="#d16b85" stroke-width="2.5"/>
-          <rect x="72" y="150" width="14" height="18" rx="6" fill="#f4a0b6" stroke="#d16b85" stroke-width="2.5"/>
-          <rect x="114" y="150" width="14" height="18" rx="6" fill="#f4a0b6" stroke="#d16b85" stroke-width="2.5"/>
-          <path d="M168 95 Q182 85 175 75 Q170 82 178 88" fill="none" stroke="#d16b85" stroke-width="4" stroke-linecap="round"/>
-          <ellipse cx="100" cy="105" rx="72" ry="52" fill="#f9b6c8" stroke="#d16b85" stroke-width="3"/>
-          <rect x="86" y="52" width="28" height="9" rx="4" fill="#7a4a55" transform="rotate(-4 100 56)"/>
-          <ellipse cx="100" cy="128" rx="26" ry="17" fill="#f9c9d6" stroke="#d16b85" stroke-width="2.5"/>
-          <ellipse cx="91" cy="128" rx="3.5" ry="5" fill="#c26e83"/>
-          <ellipse cx="109" cy="128" rx="3.5" ry="5" fill="#c26e83"/>
-          <path d="M74 90 Q80 80 90 87" fill="none" stroke="#8a4a58" stroke-width="4" stroke-linecap="round"/>
-          <path d="M126 90 Q120 80 110 87" fill="none" stroke="#8a4a58" stroke-width="4" stroke-linecap="round"/>
-          <path d="M76 96 Q84 92 92 96" fill="none" stroke="#5a2e38" stroke-width="4.5" stroke-linecap="round"/>
-          <path d="M124 96 Q116 92 108 96" fill="none" stroke="#5a2e38" stroke-width="4.5" stroke-linecap="round"/>
-          <path d="M85 112 Q100 106 115 112" fill="none" stroke="#8a4a58" stroke-width="4" stroke-linecap="round"/>
-          <circle class="sweat show" cx="150" cy="80" r="5" fill="#7dd3fc"/>
+        <svg class="piggy-svg piggy-idle" viewBox="0 0 200 195" xmlns="http://www.w3.org/2000/svg">
+          <ellipse cx="100" cy="182" rx="52" ry="8" fill="#000" opacity=".18"/>
+          <path class="ear ear-l" d="M64 62 Q48 34 62 42 Q74 47 70 64 Z" fill="#f28ba3" stroke="#d16b85" stroke-width="2.5"/>
+          <path class="ear ear-r" d="M136 62 Q152 34 138 42 Q126 47 130 64 Z" fill="#f28ba3" stroke="#d16b85" stroke-width="2.5"/>
+          <rect x="55" y="160" width="15" height="20" rx="6.5" fill="#f4a0b6" stroke="#d16b85" stroke-width="2.5"/>
+          <rect x="130" y="160" width="15" height="20" rx="6.5" fill="#f4a0b6" stroke="#d16b85" stroke-width="2.5"/>
+          <rect x="74" y="160" width="15" height="18" rx="6.5" fill="#f4a0b6" stroke="#d16b85" stroke-width="2.5"/>
+          <rect x="111" y="160" width="15" height="18" rx="6.5" fill="#f4a0b6" stroke="#d16b85" stroke-width="2.5"/>
+          <path d="M166 100 Q182 92 174 80 Q170 88 178 94" fill="none" stroke="#d16b85" stroke-width="4" stroke-linecap="round"/>
+          <ellipse cx="100" cy="110" rx="63" ry="60" fill="#f9b6c8" stroke="#d16b85" stroke-width="3"/>
+          <rect x="86" y="58" width="28" height="9" rx="4" fill="#7a4a55" transform="rotate(-4 100 62)"/>
+          <ellipse cx="100" cy="134" rx="26" ry="18" fill="#f9c9d6" stroke="#d16b85" stroke-width="2.5"/>
+          <ellipse cx="91" cy="134" rx="3.5" ry="5" fill="#c26e83"/>
+          <ellipse cx="109" cy="134" rx="3.5" ry="5" fill="#c26e83"/>
+          <path d="M75 96 Q81 86 91 93" fill="none" stroke="#8a4a58" stroke-width="4" stroke-linecap="round"/>
+          <path d="M125 96 Q119 86 109 93" fill="none" stroke="#8a4a58" stroke-width="4" stroke-linecap="round"/>
+          <path d="M77 102 Q85 98 93 102" fill="none" stroke="#5a2e38" stroke-width="4.5" stroke-linecap="round"/>
+          <path d="M123 102 Q115 98 107 102" fill="none" stroke="#5a2e38" stroke-width="4.5" stroke-linecap="round"/>
+          <path d="M86 118 Q100 112 114 118" fill="none" stroke="#8a4a58" stroke-width="4" stroke-linecap="round"/>
+          <circle class="sweat show" cx="148" cy="86" r="5" fill="#7dd3fc"/>
         </svg>
       </div>
     </div>
@@ -203,29 +220,29 @@
           <circle cx="20" cy="20" r="13" fill="none" stroke="#e0a422" stroke-width="1.5"/>
           <text x="20" y="26" font-size="16" font-weight="900" text-anchor="middle" fill="#b8710a" font-family="Georgia,serif">₹</text>
         </svg>
-        <svg class="sparkle" id="spark1" style="left:22px; top:6px; width:20px;" viewBox="0 0 24 24"><path d="M12 0l2.5 8.5L23 11l-8.5 2.5L12 22l-2.5-8.5L1 11l8.5-2.5z" fill="#ffe066"/></svg>
-        <svg class="sparkle" id="spark2" style="right:14px; top:20px; width:14px;" viewBox="0 0 24 24"><path d="M12 0l2.5 8.5L23 11l-8.5 2.5L12 22l-2.5-8.5L1 11l8.5-2.5z" fill="#7dd3fc"/></svg>
-        <svg class="piggy-svg" id="piggyHappy" viewBox="0 0 200 180" xmlns="http://www.w3.org/2000/svg">
-          <ellipse cx="100" cy="118" rx="20" ry="9" fill="#000" opacity=".18"/>
-          <path d="M60 55 Q45 30 60 38 Q70 42 66 58 Z" fill="#f28ba3" stroke="#d16b85" stroke-width="2.5"/>
-          <path d="M140 55 Q155 30 140 38 Q130 42 134 58 Z" fill="#f28ba3" stroke="#d16b85" stroke-width="2.5"/>
-          <rect x="55" y="150" width="14" height="20" rx="6" fill="#f4a0b6" stroke="#d16b85" stroke-width="2.5"/>
-          <rect x="130" y="150" width="14" height="20" rx="6" fill="#f4a0b6" stroke="#d16b85" stroke-width="2.5"/>
-          <rect x="72" y="150" width="14" height="18" rx="6" fill="#f4a0b6" stroke="#d16b85" stroke-width="2.5"/>
-          <rect x="114" y="150" width="14" height="18" rx="6" fill="#f4a0b6" stroke="#d16b85" stroke-width="2.5"/>
-          <path d="M168 95 Q184 82 174 74 Q180 84 168 88" fill="none" stroke="#d16b85" stroke-width="4" stroke-linecap="round"/>
-          <ellipse cx="100" cy="105" rx="72" ry="52" fill="#ffc2d4" stroke="#d16b85" stroke-width="3"/>
-          <rect x="86" y="52" width="28" height="9" rx="4" fill="#7a4a55" transform="rotate(-4 100 56)"/>
-          <ellipse cx="100" cy="128" rx="26" ry="17" fill="#ffd7e2" stroke="#d16b85" stroke-width="2.5"/>
-          <ellipse cx="91" cy="128" rx="3.5" ry="5" fill="#c26e83"/>
-          <ellipse cx="109" cy="128" rx="3.5" ry="5" fill="#c26e83"/>
-          <ellipse cx="72" cy="112" rx="9" ry="6" fill="#ff9db8" opacity=".7"/>
-          <ellipse cx="128" cy="112" rx="9" ry="6" fill="#ff9db8" opacity=".7"/>
-          <path d="M73 88 Q80 76 92 86" fill="none" stroke="#8a4a58" stroke-width="4" stroke-linecap="round"/>
-          <path d="M127 88 Q120 76 108 86" fill="none" stroke="#8a4a58" stroke-width="4" stroke-linecap="round"/>
-          <path d="M73 95 Q80 87 87 95" fill="none" stroke="#5a2e38" stroke-width="4.5" stroke-linecap="round"/>
-          <path d="M127 95 Q120 87 113 95" fill="none" stroke="#5a2e38" stroke-width="4.5" stroke-linecap="round"/>
-          <path d="M82 110 Q100 124 118 110" fill="none" stroke="#8a4a58" stroke-width="5" stroke-linecap="round"/>
+        <svg class="sparkle" id="spark1" style="left:20px; top:14px; width:20px;" viewBox="0 0 24 24"><path d="M12 0l2.5 8.5L23 11l-8.5 2.5L12 22l-2.5-8.5L1 11l8.5-2.5z" fill="#ffe066"/></svg>
+        <svg class="sparkle" id="spark2" style="right:12px; top:28px; width:14px;" viewBox="0 0 24 24"><path d="M12 0l2.5 8.5L23 11l-8.5 2.5L12 22l-2.5-8.5L1 11l8.5-2.5z" fill="#7dd3fc"/></svg>
+        <svg class="piggy-svg" id="piggyHappy" viewBox="0 0 200 195" xmlns="http://www.w3.org/2000/svg">
+          <ellipse cx="100" cy="182" rx="52" ry="8" fill="#000" opacity=".18"/>
+          <path class="ear ear-l" d="M64 62 Q48 34 62 42 Q74 47 70 64 Z" fill="#f28ba3" stroke="#d16b85" stroke-width="2.5"/>
+          <path class="ear ear-r" d="M136 62 Q152 34 138 42 Q126 47 130 64 Z" fill="#f28ba3" stroke="#d16b85" stroke-width="2.5"/>
+          <rect x="55" y="160" width="15" height="20" rx="6.5" fill="#f4a0b6" stroke="#d16b85" stroke-width="2.5"/>
+          <rect x="130" y="160" width="15" height="20" rx="6.5" fill="#f4a0b6" stroke="#d16b85" stroke-width="2.5"/>
+          <rect x="74" y="160" width="15" height="18" rx="6.5" fill="#f4a0b6" stroke="#d16b85" stroke-width="2.5"/>
+          <rect x="111" y="160" width="15" height="18" rx="6.5" fill="#f4a0b6" stroke="#d16b85" stroke-width="2.5"/>
+          <path d="M166 100 Q184 88 174 78 Q182 90 168 94" fill="none" stroke="#d16b85" stroke-width="4" stroke-linecap="round"/>
+          <ellipse cx="100" cy="110" rx="63" ry="60" fill="#ffc2d4" stroke="#d16b85" stroke-width="3"/>
+          <rect x="86" y="58" width="28" height="9" rx="4" fill="#7a4a55" transform="rotate(-4 100 62)"/>
+          <ellipse cx="100" cy="134" rx="26" ry="18" fill="#ffd7e2" stroke="#d16b85" stroke-width="2.5"/>
+          <ellipse cx="91" cy="134" rx="3.5" ry="5" fill="#c26e83"/>
+          <ellipse cx="109" cy="134" rx="3.5" ry="5" fill="#c26e83"/>
+          <ellipse cx="73" cy="118" rx="9" ry="6" fill="#ff9db8" opacity=".7"/>
+          <ellipse cx="127" cy="118" rx="9" ry="6" fill="#ff9db8" opacity=".7"/>
+          <path d="M74 94 Q81 82 93 92" fill="none" stroke="#8a4a58" stroke-width="4" stroke-linecap="round"/>
+          <path d="M126 94 Q119 82 107 92" fill="none" stroke="#8a4a58" stroke-width="4" stroke-linecap="round"/>
+          <path d="M74 101 Q81 93 88 101" fill="none" stroke="#5a2e38" stroke-width="4.5" stroke-linecap="round"/>
+          <path d="M126 101 Q119 93 112 101" fill="none" stroke="#5a2e38" stroke-width="4.5" stroke-linecap="round"/>
+          <path d="M83 116 Q100 130 117 116" fill="none" stroke="#8a4a58" stroke-width="5" stroke-linecap="round"/>
         </svg>
       </div>
     </div>
@@ -262,26 +279,26 @@
           <rect x="2" y="2" width="96" height="56" rx="8" fill="none" stroke="#ff3f3f" stroke-width="5"/>
           <text x="50" y="38" font-size="22" font-weight="900" text-anchor="middle" fill="#ff3f3f" font-family="Arial,sans-serif">FAILED</text>
         </svg>
-        <svg class="tear" id="tear" style="left:78px; top:88px; width:11px;" viewBox="0 0 24 24"><path d="M12 2 C12 2 5 12 5 17 A7 7 0 0 0 19 17 C19 12 12 2 12 2Z" fill="#7dd3fc"/></svg>
-        <svg class="piggy-svg" id="piggySad" viewBox="0 0 200 180" xmlns="http://www.w3.org/2000/svg">
-          <ellipse cx="100" cy="118" rx="20" ry="9" fill="#000" opacity=".18"/>
-          <path d="M60 55 Q45 32 58 40 Q66 45 63 58 Z" fill="#e7a3b3" stroke="#b3697b" stroke-width="2.5"/>
-          <path d="M140 55 Q155 32 142 40 Q134 45 137 58 Z" fill="#e7a3b3" stroke="#b3697b" stroke-width="2.5"/>
-          <rect x="55" y="150" width="14" height="20" rx="6" fill="#eaadbc" stroke="#b3697b" stroke-width="2.5"/>
-          <rect x="130" y="150" width="14" height="20" rx="6" fill="#eaadbc" stroke="#b3697b" stroke-width="2.5"/>
-          <rect x="72" y="150" width="14" height="18" rx="6" fill="#eaadbc" stroke="#b3697b" stroke-width="2.5"/>
-          <rect x="114" y="150" width="14" height="18" rx="6" fill="#eaadbc" stroke="#b3697b" stroke-width="2.5"/>
-          <path d="M168 98 Q178 92 172 86" fill="none" stroke="#b3697b" stroke-width="4" stroke-linecap="round"/>
-          <ellipse cx="100" cy="108" rx="72" ry="52" fill="#e3aebb" stroke="#b3697b" stroke-width="3"/>
-          <rect x="86" y="55" width="28" height="9" rx="4" fill="#6a4048" transform="rotate(-4 100 59)"/>
-          <ellipse cx="100" cy="130" rx="26" ry="17" fill="#e9c0cb" stroke="#b3697b" stroke-width="2.5"/>
-          <ellipse cx="91" cy="130" rx="3.5" ry="5" fill="#a25e6f"/>
-          <ellipse cx="109" cy="130" rx="3.5" ry="5" fill="#a25e6f"/>
-          <path d="M74 92 Q82 98 92 94" fill="none" stroke="#6e4048" stroke-width="4" stroke-linecap="round"/>
-          <path d="M126 92 Q118 98 108 94" fill="none" stroke="#6e4048" stroke-width="4" stroke-linecap="round"/>
-          <circle cx="82" cy="102" r="4.5" fill="#3a2226"/>
-          <circle cx="118" cy="102" r="4.5" fill="#3a2226"/>
-          <path d="M85 122 Q100 114 115 122" fill="none" stroke="#6e4048" stroke-width="4.5" stroke-linecap="round"/>
+        <svg class="tear" id="tear" style="left:76px; top:96px; width:11px;" viewBox="0 0 24 24"><path d="M12 2 C12 2 5 12 5 17 A7 7 0 0 0 19 17 C19 12 12 2 12 2Z" fill="#7dd3fc"/></svg>
+        <svg class="piggy-svg" id="piggySad" viewBox="0 0 200 195" xmlns="http://www.w3.org/2000/svg">
+          <ellipse cx="100" cy="182" rx="52" ry="8" fill="#000" opacity=".18"/>
+          <path class="ear ear-l" d="M64 62 Q48 36 61 44 Q68 49 65 64 Z" fill="#e7a3b3" stroke="#b3697b" stroke-width="2.5"/>
+          <path class="ear ear-r" d="M136 62 Q152 36 139 44 Q132 49 135 64 Z" fill="#e7a3b3" stroke="#b3697b" stroke-width="2.5"/>
+          <rect x="55" y="160" width="15" height="20" rx="6.5" fill="#eaadbc" stroke="#b3697b" stroke-width="2.5"/>
+          <rect x="130" y="160" width="15" height="20" rx="6.5" fill="#eaadbc" stroke="#b3697b" stroke-width="2.5"/>
+          <rect x="74" y="160" width="15" height="18" rx="6.5" fill="#eaadbc" stroke="#b3697b" stroke-width="2.5"/>
+          <rect x="111" y="160" width="15" height="18" rx="6.5" fill="#eaadbc" stroke="#b3697b" stroke-width="2.5"/>
+          <path d="M166 102 Q176 96 170 90" fill="none" stroke="#b3697b" stroke-width="4" stroke-linecap="round"/>
+          <ellipse cx="100" cy="112" rx="63" ry="60" fill="#e3aebb" stroke="#b3697b" stroke-width="3"/>
+          <rect x="86" y="60" width="28" height="9" rx="4" fill="#6a4048" transform="rotate(-4 100 64)"/>
+          <ellipse cx="100" cy="136" rx="26" ry="18" fill="#e9c0cb" stroke="#b3697b" stroke-width="2.5"/>
+          <ellipse cx="91" cy="136" rx="3.5" ry="5" fill="#a25e6f"/>
+          <ellipse cx="109" cy="136" rx="3.5" ry="5" fill="#a25e6f"/>
+          <path d="M75 100 Q83 106 93 102" fill="none" stroke="#6e4048" stroke-width="4" stroke-linecap="round"/>
+          <path d="M125 100 Q117 106 107 102" fill="none" stroke="#6e4048" stroke-width="4" stroke-linecap="round"/>
+          <circle cx="83" cy="110" r="4.5" fill="#3a2226"/>
+          <circle cx="117" cy="110" r="4.5" fill="#3a2226"/>
+          <path d="M86 128 Q100 120 114 128" fill="none" stroke="#6e4048" stroke-width="4.5" stroke-linecap="round"/>
         </svg>
       </div>
     </div>
