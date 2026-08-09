@@ -187,15 +187,16 @@ body{
   .dropzone .ti{ font-size:18px; color:var(--violet); display:block; margin-bottom:4px; }
 
   .file-preview{
-    display:flex; align-items:center; gap:10px; margin-top:10px; padding:10px;
-    border:1px solid var(--border2); border-radius:12px; background:var(--surface3);
+    display:flex; align-items:center; gap:8px; margin-top:6px; padding:7px 8px;
+    border:1px solid var(--border2); border-radius:10px; background:var(--surface3);
   }
-  .file-preview img{ width:44px; height:44px; border-radius:8px; object-fit:cover; flex-shrink:0; }
+  .file-preview img{ width:34px; height:34px; border-radius:7px; object-fit:cover; flex-shrink:0; }
   .file-preview-info{ flex:1; min-width:0; }
-  .file-preview-name{ font-size:11.5px; font-weight:700; color:var(--text); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .file-preview-name{ font-size:10px; font-weight:700; color:var(--text); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
   .file-preview-size{ font-size:9.5px; color:var(--text3); margin-top:2px; }
+  .file-preview audio{ height:26px; margin-top:3px; }
   .file-preview-remove{
-    flex-shrink:0; width:26px; height:26px; border-radius:8px; border:1px solid var(--border2);
+    flex-shrink:0; width:22px; height:22px; border-radius:7px; border:1px solid var(--border2);
     background:var(--surface2); color:var(--text2); cursor:pointer; display:flex;
     align-items:center; justify-content:center; transition:.15s;
   }
@@ -204,9 +205,9 @@ body{
 
   /* voice recorder */
   .record-btn{
-    width:100%; margin-top:8px; padding:10px; border-radius:11px; cursor:pointer;
+    width:100%; padding:9px; border-radius:11px; cursor:pointer;
     border:1px solid var(--border2); background:var(--surface3); color:var(--text2);
-    font-family:var(--font-mono); font-size:11.5px; font-weight:700;
+    font-family:var(--font-mono); font-size:11px; font-weight:700;
     display:flex; align-items:center; justify-content:center; gap:7px;
     transition:.15s;
   }
@@ -218,7 +219,13 @@ body{
     width:8px; height:8px; border-radius:50%; background:var(--red);
     box-shadow:0 0 8px var(--red); animation:blink 1s ease-in-out infinite;
   }
-  .upload-status{ font-size:10px; color:var(--text3); margin-top:6px; }
+  .upload-link{
+    display:block; text-align:center; margin-top:6px; font-size:10px;
+    color:var(--text3); text-decoration:underline; cursor:pointer; background:none; border:none;
+    font-family:var(--font-mono); width:100%; padding:2px;
+  }
+  .upload-link:hover{ color:var(--text2); }
+  .upload-status{ font-size:9.5px; color:var(--text3); margin-top:4px; }
   .upload-status.error{ color:#ff9db0; }
   .upload-status.ok{ color:#7ee7c7; }
 
@@ -429,6 +436,20 @@ body{
   }
 
   window.addEventListener('resize', () => { if (CFG) fitModalFixedSize(); });
+
+  // Lightweight refit for content that changes AFTER init (audio preview,
+  // upload status) — unlike fitModalFixedSize() this just measures the
+  // modal's current real DOM, so it never wipes out the preview/status
+  // markup that was just rendered.
+  function refitCurrentContent(){
+    const modal = document.querySelector('.modal');
+    if (!modal) return;
+    modal.style.transform = 'none';
+    const available = window.innerHeight - 24;
+    const natural = modal.scrollHeight;
+    const scale = natural > available ? Math.max(available / natural, 0.6) : 1;
+    modal.style.transform = scale < 1 ? 'scale(' + scale.toFixed(3) + ')' : 'none';
+  }
 
   function renderTypeCards(){
     const grid = document.getElementById('typeGrid');
@@ -662,14 +683,12 @@ body{
           <i class="ti ti-microphone"></i><span id="recordBtnLabel">Tap to record your voice</span>
         </button>
         <input type="file" id="audioFileInput" accept="audio/*" hidden>
-        <div class="dropzone" id="audioDropzone" tabindex="0" role="button" aria-label="Upload audio clip" style="margin-top:8px;">
-          <i class="ti ti-cloud-upload"></i>Or click to upload a voice clip
-          <div class="file-hint">mp3 · wav · m4a · webm — max 8MB</div>
-        </div>
+        <button type="button" class="upload-link" id="audioUploadLink">or upload a file instead</button>
         <div class="file-preview" id="audioPreview" style="display:none;"></div>
         <div class="upload-status" id="audioUploadStatus" style="display:none;"></div>`;
       bindMessageInput();
-      bindDropzone('audioDropzone', 'audioFileInput', onAudioFileSelected);
+      document.getElementById('audioUploadLink').addEventListener('click', () => document.getElementById('audioFileInput').click());
+      document.getElementById('audioFileInput').addEventListener('change', (e) => { if (e.target.files[0]) onAudioFileSelected(e.target.files[0]); });
       document.getElementById('recordBtn').addEventListener('click', toggleRecording);
     } else {
       wrap.innerHTML = `
@@ -734,10 +753,11 @@ body{
       preview.innerHTML = `
         <div class="file-preview-info" style="flex:1;">
           <div class="file-preview-name">${escapeHtmlLocal(file.name)}</div>
-          <audio controls src="${localUrl}" style="width:100%;margin-top:6px;"></audio>
+          <audio controls src="${localUrl}" style="width:100%;margin-top:3px;"></audio>
         </div>
         <button type="button" class="file-preview-remove" id="audioRemoveBtn"><i class="ti ti-x"></i></button>`;
       document.getElementById('audioRemoveBtn').addEventListener('click', clearAudioFile);
+      refitCurrentContent();
     }
 
     if (statusEl) { statusEl.style.display = 'block'; statusEl.className = 'upload-status'; statusEl.textContent = 'Uploading…'; }
@@ -769,6 +789,7 @@ body{
       if (statusEl) { statusEl.className = 'upload-status error'; statusEl.textContent = 'Upload failed — ' + err.message; }
     } finally {
       if (submitBtn) submitBtn.disabled = false;
+      refitCurrentContent();
     }
   }
 
@@ -788,6 +809,7 @@ body{
     if (preview) { preview.style.display = 'none'; preview.innerHTML = ''; }
     if (input) input.value = '';
     if (statusEl) { statusEl.style.display = 'none'; statusEl.textContent = ''; }
+    refitCurrentContent();
   }
 
   document.getElementById('amountInput').addEventListener('input', updateAll);
