@@ -24,7 +24,7 @@ body{
   padding:10px;
   background:
     linear-gradient(rgba(0,0,0,.5), rgba(0,0,0,.5)),
-    url('screenshot-17862573618201 (1).jpeg') center/cover no-repeat;
+    url('bg-gojo.webp') center/cover no-repeat;
 }
 
 /* ===== MODAL ===== */
@@ -174,7 +174,7 @@ body{
 
   /* media/audio dropzone */
   .dropzone{
-    border:1.5px dashed var(--border2); border-radius:12px; padding:22px 10px;
+    border:1.5px dashed var(--border2); border-radius:11px; padding:12px 10px;
     text-align:center; color:var(--text3); font-size:11px; cursor:pointer;
     background:
       repeating-linear-gradient(-45deg, rgba(168,85,247,.05) 0 10px, transparent 10px 20px);
@@ -184,7 +184,7 @@ body{
   .dropzone:hover, .dropzone:focus-visible{ border-color:var(--violet); color:var(--text2); outline:none; }
   .dropzone.drag{ border-color:var(--cyan); background-color:rgba(34,211,238,.06); color:var(--text); }
   @keyframes dashMove{ from{background-position:0 0;} to{background-position:28px 0;} }
-  .dropzone .ti{ font-size:22px; color:var(--violet); display:block; margin-bottom:6px; }
+  .dropzone .ti{ font-size:18px; color:var(--violet); display:block; margin-bottom:4px; }
 
   .file-preview{
     display:flex; align-items:center; gap:10px; margin-top:10px; padding:10px;
@@ -201,6 +201,26 @@ body{
   }
   .file-preview-remove:hover{ color:var(--red); border-color:var(--red); }
   .file-hint{ font-size:9.5px; color:var(--text3); margin-top:2px; }
+
+  /* voice recorder */
+  .record-btn{
+    width:100%; margin-top:8px; padding:10px; border-radius:11px; cursor:pointer;
+    border:1px solid var(--border2); background:var(--surface3); color:var(--text2);
+    font-family:var(--font-mono); font-size:11.5px; font-weight:700;
+    display:flex; align-items:center; justify-content:center; gap:7px;
+    transition:.15s;
+  }
+  .record-btn:hover{ border-color:var(--violet); color:var(--text); }
+  .record-btn.recording{
+    border-color:var(--red); color:#ff9db0; background:rgba(255,63,102,.08);
+  }
+  .rec-dot{
+    width:8px; height:8px; border-radius:50%; background:var(--red);
+    box-shadow:0 0 8px var(--red); animation:blink 1s ease-in-out infinite;
+  }
+  .upload-status{ font-size:10px; color:var(--text3); margin-top:6px; }
+  .upload-status.error{ color:#ff9db0; }
+  .upload-status.ok{ color:#7ee7c7; }
 
   /* loyalty row */
   .loyalty-row{
@@ -508,7 +528,10 @@ body{
       renderMessageFieldFor(activeType);
       wrap.dataset.renderedType = typeId;
       if (typeId !== 'media') clearMediaFile();
-      if (typeId !== 'audio') clearAudioFile();
+      if (typeId !== 'audio') {
+        if (isRecording && mediaRecorder) mediaRecorder.stop();
+        clearAudioFile();
+      }
     }
 
     // submit button
@@ -529,9 +552,79 @@ body{
   }
   bindMessageInput();
 
+  // ===== Voice recording (MediaRecorder) =====
+  let mediaRecorder   = null;
+  let recordedChunks  = [];
+  let recTimerHandle  = null;
+  let recSeconds      = 0;
+  let isRecording     = false;
+  const MAX_RECORD_SECONDS = 60;
+
+  async function toggleRecording(){
+    if (isRecording) { mediaRecorder.stop(); return; }
+
+    if (!navigator.mediaDevices || !window.MediaRecorder) {
+      alert('Voice recording is not supported in this browser — please upload a file instead.');
+      return;
+    }
+
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      recordedChunks = [];
+      const mimeType = MediaRecorder.isTypeSupported('audio/webm') ? 'audio/webm'
+                      : MediaRecorder.isTypeSupported('audio/mp4')  ? 'audio/mp4'
+                      : '';
+      mediaRecorder = mimeType ? new MediaRecorder(stream, { mimeType }) : new MediaRecorder(stream);
+
+      mediaRecorder.ondataavailable = e => { if (e.data && e.data.size > 0) recordedChunks.push(e.data); };
+
+      mediaRecorder.onstop = () => {
+        stream.getTracks().forEach(t => t.stop());
+        clearInterval(recTimerHandle);
+        isRecording = false;
+
+        const timerEl = document.getElementById('recTimer');
+        const btn = document.getElementById('recordBtn');
+        const label = document.getElementById('recordBtnLabel');
+        if (timerEl) timerEl.style.display = 'none';
+        if (btn) btn.classList.remove('recording');
+        if (label) label.textContent = 'Tap to record your voice';
+
+        const type = mediaRecorder.mimeType || 'audio/webm';
+        const blob = new Blob(recordedChunks, { type });
+        if (blob.size === 0) return;
+
+        const ext  = type.includes('mp4') ? 'm4a' : 'webm';
+        const file = new File([blob], `voice-note.${ext}`, { type });
+        onAudioFileSelected(file);
+      };
+
+      mediaRecorder.start();
+      isRecording = true;
+      recSeconds = 0;
+
+      const timerEl = document.getElementById('recTimer');
+      const btn = document.getElementById('recordBtn');
+      const label = document.getElementById('recordBtnLabel');
+      if (btn) btn.classList.add('recording');
+      if (label) label.textContent = 'Stop recording';
+      if (timerEl) { timerEl.style.display = 'inline-flex'; timerEl.textContent = '● 0:00'; }
+
+      recTimerHandle = setInterval(() => {
+        recSeconds++;
+        const m = Math.floor(recSeconds / 60), s = recSeconds % 60;
+        if (timerEl) timerEl.textContent = '● ' + m + ':' + String(s).padStart(2, '0');
+        if (recSeconds >= MAX_RECORD_SECONDS) mediaRecorder.stop();
+      }, 1000);
+
+    } catch (err) {
+      alert('Could not access microphone: ' + err.message);
+    }
+  }
+
   // ===== Media (image/GIF) + Audio file uploads =====
   let selectedMediaFile = null; // { name, size, dataUrl }
-  let selectedAudioFile = null; // { name, size } — bytes stay in-memory only, not persisted
+  let selectedAudioFile = null; // { name, size, url, uploading }
 
   const MAX_IMAGE_BYTES = 2 * 1024 * 1024;   // 2MB — kept small so it's safe to carry in sessionStorage
   const MAX_AUDIO_BYTES = 8 * 1024 * 1024;   // 8MB
@@ -561,15 +654,23 @@ body{
       wrap.innerHTML = `
         <div class="field-label"><span>${CFG.labels.messageField}</span><span id="msgCounter">0/${CFG.messageMaxLength}</span></div>
         <textarea class="textarea" id="messageInput" maxlength="${CFG.messageMaxLength}" placeholder="${CFG.labels.messagePlaceholder}"></textarea>
-        <div class="field-label" style="margin-top:12px;">ATTACH VOICE CLIP (OPTIONAL)</div>
-        <input type="file" id="audioFileInput" accept="audio/*" hidden>
-        <div class="dropzone" id="audioDropzone" tabindex="0" role="button" aria-label="Upload audio clip">
-          <i class="ti ti-microphone"></i>Click to upload a voice clip
-          <div class="file-hint">mp3 · wav · m4a — max 8MB</div>
+        <div class="field-label" style="margin-top:12px; display:flex; justify-content:space-between; align-items:center;">
+          <span>ATTACH VOICE CLIP (OPTIONAL)</span>
+          <span id="recTimer" style="display:none; color:#ff9db0; font-weight:700;"></span>
         </div>
-        <div class="file-preview" id="audioPreview" style="display:none;"></div>`;
+        <button type="button" class="record-btn" id="recordBtn">
+          <i class="ti ti-microphone"></i><span id="recordBtnLabel">Tap to record your voice</span>
+        </button>
+        <input type="file" id="audioFileInput" accept="audio/*" hidden>
+        <div class="dropzone" id="audioDropzone" tabindex="0" role="button" aria-label="Upload audio clip" style="margin-top:8px;">
+          <i class="ti ti-cloud-upload"></i>Or click to upload a voice clip
+          <div class="file-hint">mp3 · wav · m4a · webm — max 8MB</div>
+        </div>
+        <div class="file-preview" id="audioPreview" style="display:none;"></div>
+        <div class="upload-status" id="audioUploadStatus" style="display:none;"></div>`;
       bindMessageInput();
       bindDropzone('audioDropzone', 'audioFileInput', onAudioFileSelected);
+      document.getElementById('recordBtn').addEventListener('click', toggleRecording);
     } else {
       wrap.innerHTML = `
         <div class="field-label"><span>${CFG.labels.messageField}</span><span id="msgCounter">0/${CFG.messageMaxLength}</span></div>
@@ -617,21 +718,58 @@ body{
     reader.readAsDataURL(file);
   }
 
-  function onAudioFileSelected(file){
+  async function onAudioFileSelected(file){
     if (!file.type.startsWith('audio/')) { alert('Please choose an audio file'); return; }
     if (file.size > MAX_AUDIO_BYTES) { alert('Audio clip must be under 8MB'); return; }
-    selectedAudioFile = { name: file.name, size: file.size };
-    const preview = document.getElementById('audioPreview');
-    if (!preview) return;
-    const url = URL.createObjectURL(file);
-    preview.style.display = 'flex';
-    preview.innerHTML = `
-      <div class="file-preview-info" style="flex:1;">
-        <div class="file-preview-name">${escapeHtmlLocal(file.name)}</div>
-        <audio controls src="${url}" style="width:100%;margin-top:6px;"></audio>
-      </div>
-      <button type="button" class="file-preview-remove" id="audioRemoveBtn"><i class="ti ti-x"></i></button>`;
-    document.getElementById('audioRemoveBtn').addEventListener('click', clearAudioFile);
+
+    selectedAudioFile = { name: file.name, size: file.size, url: null, uploading: true };
+
+    const preview  = document.getElementById('audioPreview');
+    const statusEl = document.getElementById('audioUploadStatus');
+    const submitBtn = document.getElementById('submitBtn');
+
+    if (preview) {
+      const localUrl = URL.createObjectURL(file);
+      preview.style.display = 'flex';
+      preview.innerHTML = `
+        <div class="file-preview-info" style="flex:1;">
+          <div class="file-preview-name">${escapeHtmlLocal(file.name)}</div>
+          <audio controls src="${localUrl}" style="width:100%;margin-top:6px;"></audio>
+        </div>
+        <button type="button" class="file-preview-remove" id="audioRemoveBtn"><i class="ti ti-x"></i></button>`;
+      document.getElementById('audioRemoveBtn').addEventListener('click', clearAudioFile);
+    }
+
+    if (statusEl) { statusEl.style.display = 'block'; statusEl.className = 'upload-status'; statusEl.textContent = 'Uploading…'; }
+    if (submitBtn) submitBtn.disabled = true;
+
+    try {
+      const signRes = await fetch('/api/media-upload-url', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ kind: 'audio', fileName: file.name, fileType: file.type, fileSize: file.size }),
+      });
+      const signData = await signRes.json();
+      if (!signRes.ok) throw new Error(signData.error || 'Could not get an upload URL');
+
+      const putRes = await fetch(signData.uploadUrl, {
+        method: 'PUT',
+        headers: { 'Content-Type': file.type || 'application/octet-stream' },
+        body: file,
+      });
+      if (!putRes.ok) throw new Error('Upload to storage failed (' + putRes.status + ')');
+
+      selectedAudioFile.url = signData.publicUrl;
+      selectedAudioFile.uploading = false;
+      if (statusEl) { statusEl.className = 'upload-status ok'; statusEl.textContent = '✓ Uploaded — ready to send'; }
+
+    } catch (err) {
+      selectedAudioFile.uploading = false;
+      selectedAudioFile.url = null;
+      if (statusEl) { statusEl.className = 'upload-status error'; statusEl.textContent = 'Upload failed — ' + err.message; }
+    } finally {
+      if (submitBtn) submitBtn.disabled = false;
+    }
   }
 
   function clearMediaFile(){
@@ -646,8 +784,10 @@ body{
     selectedAudioFile = null;
     const preview = document.getElementById('audioPreview');
     const input = document.getElementById('audioFileInput');
+    const statusEl = document.getElementById('audioUploadStatus');
     if (preview) { preview.style.display = 'none'; preview.innerHTML = ''; }
     if (input) input.value = '';
+    if (statusEl) { statusEl.style.display = 'none'; statusEl.textContent = ''; }
   }
 
   document.getElementById('amountInput').addEventListener('input', updateAll);
@@ -661,6 +801,12 @@ body{
     if (!name) { alert('Please enter your name'); return; }
     if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { alert('Enter a valid email'); return; }
     if (!amount || amount < 1 || !selectedType) { alert('Please choose an amount and message type'); return; }
+    if (selectedType === 'audio' && selectedAudioFile && selectedAudioFile.uploading) {
+      alert('Your voice clip is still uploading — please wait a moment.'); return;
+    }
+    if (selectedType === 'audio' && selectedAudioFile && !selectedAudioFile.url) {
+      alert('Voice clip upload failed — please re-record or remove it before submitting.'); return;
+    }
 
     const activeType = CFG.messageTypes.find(t => t.id === selectedType);
 
@@ -675,11 +821,9 @@ body{
     if (selectedType === 'media' && selectedMediaFile) {
       payload.mediaFile = { name: selectedMediaFile.name, size: selectedMediaFile.size, dataUrl: selectedMediaFile.dataUrl };
     }
-    if (selectedType === 'audio' && selectedAudioFile) {
-      // Only metadata is kept — the audio bytes themselves aren't wired to a
-      // backend upload endpoint yet, so they aren't carried past this page.
+    if (selectedType === 'audio' && selectedAudioFile && selectedAudioFile.url) {
+      payload.audioUrl = selectedAudioFile.url;
       payload.audioFileName = selectedAudioFile.name;
-      payload.audioFileSize = selectedAudioFile.size;
     }
 
     try {
