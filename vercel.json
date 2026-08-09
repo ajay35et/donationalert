@@ -6,5 +6,8 @@
     { "source": "/thankyou", "destination": "/thankyou.html" },
     { "source": "/donate", "destination": "/donate-popup.html" },
     { "source": "/payment", "destination": "/payment.html" }
+  ],
+  "crons": [
+    { "path": "/api/cleanup-audio", "schedule": "0 3 * * *" }
   ]
 }
