@@ -879,9 +879,6 @@ async function onMediaFileSelected(file){
       currencyCode: CFG.currency.code,
       source: 'popup'
     };
-    if (selectedType === 'media' && selectedMediaFile) {
-      payload.mediaFile = { name: selectedMediaFile.name, size: selectedMediaFile.size, dataUrl: selectedMediaFile.dataUrl };
-    }
     if (selectedType === 'media' && selectedMediaFile && selectedMediaFile.url) {
       payload.mediaUrl = selectedMediaFile.url;
       payload.mediaFileName = selectedMediaFile.name;
@@ -890,9 +887,8 @@ async function onMediaFileSelected(file){
     try {
       sessionStorage.setItem('donationData', JSON.stringify(payload));
     } catch (e) {
-      // sessionStorage quota exceeded (e.g. large image) — drop the image data URL and retry
-      delete payload.mediaFile;
-      sessionStorage.setItem('donationData', JSON.stringify(payload));
+      alert('Could not save your donation details — please try again.');
+      return;
     }
 
     window.location.href = 'payment.html'; // vercel.json also rewrites /payment → payment.html
