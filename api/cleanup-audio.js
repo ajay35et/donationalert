@@ -71,13 +71,26 @@ export default async function handler(req, res) {
     return res.status(500).json({ error: 'Supabase credentials not configured' });
   }
 
-  const cutoff = Date.now() - RETENTION_DAYS * 24 * 60 * 60 * 1000;
+  const cutoff = Date.now() - 20 * 60 * 1000; // TESTING: 20 minutes
   const results = {};
+  const debug = req.query && req.query.debug === '1';
+  const debugInfo = {};
 
   for (const bucket of BUCKETS) {
     try {
       const objects = await listAllPending(bucket);
-      const stale = objects.filter(o => o.created_at && new Date(o.created_at).getTime() < cutoff);
+      if (debug) {
+        debugInfo[bucket] = objects.map(o => ({
+          name: o.name,
+          created_at: o.created_at,
+          updated_at: o.updated_at,
+        }));
+      }
+
+      const stale = objects.filter(o => {
+        const ts = o.created_at || o.updated_at; // fall back if created_at is missing
+        return ts && new Date(ts).getTime() < cutoff;
+      });
       const paths = stale.map(o => `pending/${o.name}`);
 
       // Delete in chunks of 100 — keeps each request small and avoids
@@ -94,5 +107,7 @@ export default async function handler(req, res) {
   }
 
   console.log('[cleanup-audio] run complete', results);
-  return res.status(200).json({ ok: true, retentionDays: RETENTION_DAYS, results });
+  const response = { ok: true, retentionDays: RETENTION_DAYS, results };
+  if (debug) response.debug = debugInfo;
+  return res.status(200).json(response);
 }
