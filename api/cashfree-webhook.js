@@ -53,6 +53,20 @@ async function updateDonation(order_id, fields) {
 
 const SE_PROVIDER_LABELS = { cashfree: 'Cashfree' };
 
+// Strip our internal [TYPE] prefix and |MEDIA:<url> suffix before sending to
+// StreamElements — the Alert Box widget and its built-in Text-to-Speech both
+// read the raw `message` field literally, so they must only ever see the
+// donor's actual text. The full tagged version stays in Supabase; our own
+// /api/latest-audio endpoint reads it from there separately for the custom
+// voice-clip widget.
+function cleanMessageForSE(raw) {
+  if (!raw) return '';
+  return raw
+    .replace(/^\[[^\]]+\]\s*/, '')   // leading [AUDIO] / [TEXT] / [IMAGE / GIF] tag
+    .replace(/\|MEDIA:.+$/i, '')     // trailing |MEDIA:<url>
+    .trim();
+}
+
 async function fireStreamElements({ name, email, amount, currency, message, orderId }) {
   const res = await fetch(
     `https://api.streamelements.com/kappa/v2/tips/${process.env.SE_CHANNEL_ID}`,
@@ -65,7 +79,7 @@ async function fireStreamElements({ name, email, amount, currency, message, orde
       body: JSON.stringify({
         user: { username: name, userId: `cashfree-${orderId}`, email },
         provider: SE_PROVIDER_LABELS.cashfree,
-        message: message || 'Thanks for the tip!',
+        message: cleanMessageForSE(message) || 'Thanks for the tip!',
         amount,
         currency,
         imported: 'true',
