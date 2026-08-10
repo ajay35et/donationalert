@@ -71,7 +71,7 @@ export default async function handler(req, res) {
     return res.status(500).json({ error: 'Supabase credentials not configured' });
   }
 
-  const cutoff = Date.now() - 20 * 60 * 1000; // TESTING: 20 minutes
+  const cutoff = Date.now() - RETENTION_DAYS * 24 * 60 * 60 * 1000; // 7 din
   const results = {};
   const debug = req.query && req.query.debug === '1';
   const debugInfo = {};
