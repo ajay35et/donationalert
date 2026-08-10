@@ -64,6 +64,13 @@ function seProviderLabel(provider) {
   return SE_PROVIDER_LABELS[provider] || (provider.charAt(0).toUpperCase() + provider.slice(1));
 }
 
+// See cashfree-webhook.js for why this exists — Alert Box + built-in TTS
+// must only ever see the donor's clean text, never our [TYPE]/|MEDIA: tags.
+function cleanMessageForSE(raw) {
+  if (!raw) return '';
+  return raw.replace(/^\[[^\]]+\]\s*/, '').replace(/\|MEDIA:.+$/i, '').trim();
+}
+
 async function fireStreamElements({ name, email, amount, currency, message, orderId, provider }) {
   const res = await fetch(
     `https://api.streamelements.com/kappa/v2/tips/${process.env.SE_CHANNEL_ID}`,
@@ -80,7 +87,7 @@ async function fireStreamElements({ name, email, amount, currency, message, orde
           email,
         },
         provider: seProviderLabel(provider),
-        message:  message || 'Thanks for the tip!',
+        message:  cleanMessageForSE(message) || 'Thanks for the tip!',
         amount,
         currency,
         imported: 'true',
