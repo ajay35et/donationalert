@@ -8,6 +8,6 @@
     { "source": "/payment", "destination": "/payment.html" }
   ],
   "crons": [
-    { "path": "/api/cleanup-audio", "schedule": "34 11 * * *" }
+    { "path": "/api/cleanup-audio", "schedule": "58 5 * * *" }
   ]
 }
