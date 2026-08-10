@@ -267,15 +267,12 @@
     if (state.type === 'audio' && state.audioUrl) {
       return `[AUDIO] ${state.message || ''}`.trim() + `|MEDIA:${state.audioUrl}`;
     }
-    if (state.type === 'media' && state.mediaUrl) {
-      return `[IMAGE] ${state.message || ''}`.trim() + `|MEDIA:${state.mediaUrl}`;
-    }
     if (state.type && state.type !== 'text' && state.typeLabel) {
       return `[${state.typeLabel}] ${state.message || ''}`.trim();
     }
     return state.message || '';
   }
-  
+
   async function handleCashfree(){
     const res = await fetch('/api/create-order', {
       method: 'POST',
