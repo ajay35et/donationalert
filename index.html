@@ -716,26 +716,65 @@ body{
     input.addEventListener('change', () => { if (input.files[0]) onSelect(input.files[0]); });
   }
 
-  function onMediaFileSelected(file){
+async function onMediaFileSelected(file){
     if (!file.type.startsWith('image/')) { alert('Please choose an image or GIF file'); return; }
     if (file.size > MAX_IMAGE_BYTES) { alert('Image must be under 2MB'); return; }
-    const reader = new FileReader();
-    reader.onload = () => {
-      selectedMediaFile = { name: file.name, size: file.size, dataUrl: reader.result };
-      const preview = document.getElementById('mediaPreview');
-      if (!preview) return;
+
+    selectedMediaFile = { name: file.name, size: file.size, url: null, uploading: true };
+
+    const preview   = document.getElementById('mediaPreview');
+    const submitBtn = document.getElementById('submitBtn');
+    const localUrl  = URL.createObjectURL(file);
+
+    if (preview) {
       preview.style.display = 'flex';
       preview.innerHTML = `
-        <img src="${reader.result}" alt="">
+        <img src="${localUrl}" alt="">
         <div class="file-preview-info">
           <div class="file-preview-name">${escapeHtmlLocal(file.name)}</div>
-          <div class="file-preview-size">${(file.size/1024).toFixed(0)} KB</div>
+          <div class="file-preview-size" id="mediaUploadStatus">Uploading…</div>
         </div>
         <button type="button" class="file-preview-remove" id="mediaRemoveBtn"><i class="ti ti-x"></i></button>`;
       document.getElementById('mediaRemoveBtn').addEventListener('click', clearMediaFile);
-    };
-    reader.readAsDataURL(file);
+    }
+    if (submitBtn) submitBtn.disabled = true;
+
+    try {
+      const signRes = await fetch('/api/media-upload-url', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ kind: 'image', fileName: file.name, fileType: file.type, fileSize: file.size }),
+      });
+      const signData = await signRes.json();
+      if (!signRes.ok) throw new Error(signData.error || 'Could not get an upload URL');
+
+      const putRes = await fetch(signData.uploadUrl, {
+        method: 'PUT',
+        headers: { 'Content-Type': file.type || 'application/octet-stream' },
+        body: file,
+      });
+      if (!putRes.ok) throw new Error('Upload to storage failed (' + putRes.status + ')');
+
+      selectedMediaFile.url = signData.publicUrl;
+      selectedMediaFile.uploading = false;
+      const statusEl = document.getElementById('mediaUploadStatus');
+      if (statusEl) statusEl.textContent = '✓ Uploaded — ready to send';
+
+    } catch (err) {
+      selectedMediaFile.uploading = false;
+      selectedMediaFile.url = null;
+      const statusEl = document.getElementById('mediaUploadStatus');
+      if (statusEl) statusEl.textContent = 'Upload failed — ' + err.message;
+    } finally {
+      if (submitBtn) submitBtn.disabled = false;
+    }
   }
+  if (selectedType === 'media' && selectedMediaFile && selectedMediaFile.uploading) {
+      alert('Your image is still uploading — please wait a moment.'); return;
+    }
+    if (selectedType === 'media' && selectedMediaFile && !selectedMediaFile.url) {
+      alert('Image upload failed — please re-select it before submitting.'); return;
+    }
 
   async function onAudioFileSelected(file){
     if (!file.type.startsWith('audio/')) { alert('Please choose an audio file'); return; }
@@ -843,9 +882,9 @@ body{
     if (selectedType === 'media' && selectedMediaFile) {
       payload.mediaFile = { name: selectedMediaFile.name, size: selectedMediaFile.size, dataUrl: selectedMediaFile.dataUrl };
     }
-    if (selectedType === 'audio' && selectedAudioFile && selectedAudioFile.url) {
-      payload.audioUrl = selectedAudioFile.url;
-      payload.audioFileName = selectedAudioFile.name;
+    if (selectedType === 'media' && selectedMediaFile && selectedMediaFile.url) {
+      payload.mediaUrl = selectedMediaFile.url;
+      payload.mediaFileName = selectedMediaFile.name;
     }
 
     try {
