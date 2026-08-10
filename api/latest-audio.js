@@ -21,6 +21,7 @@ const MATCH_WINDOW_MINUTES = 5; // only consider donations paid in the last N mi
 
 function extractMediaUrl(message) {
   if (!message) return null;
+  if (!/^\[AUDIO\]/i.test(message)) return null; // not an audio donation — don't leak an image/other media URL here
   const match = message.match(/\|MEDIA:(.+)$/i);
   return match ? match[1].trim() : null;
 }
