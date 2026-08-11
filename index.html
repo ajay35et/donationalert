@@ -644,7 +644,7 @@ body{
   }
 
   // ===== Media (image/GIF) + Audio file uploads =====
-  let selectedMediaFile = null; // { name, size, dataUrl }
+  let selectedMediaFile = null; // { name, size, url, uploading }
   let selectedAudioFile = null; // { name, size, url, uploading }
 
   const MAX_IMAGE_BYTES = 2 * 1024 * 1024;   // 2MB — kept small so it's safe to carry in sessionStorage
@@ -668,7 +668,8 @@ body{
           <i class="ti ti-cloud-upload"></i>Click to choose an image or GIF, or drop it here
           <div class="file-hint">png · jpg · gif — max 2MB</div>
         </div>
-        <div class="file-preview" id="mediaPreview" style="display:none;"></div>`;
+        <div class="file-preview" id="mediaPreview" style="display:none;"></div>
+        <div class="upload-status" id="mediaUploadStatus" style="display:none;"></div>`;
       bindMessageInput();
       bindDropzone('mediaDropzone', 'mediaFileInput', onMediaFileSelected);
     } else if (id === 'audio') {
@@ -716,25 +717,65 @@ body{
     input.addEventListener('change', () => { if (input.files[0]) onSelect(input.files[0]); });
   }
 
-  function onMediaFileSelected(file){
+  async function onMediaFileSelected(file){
     if (!file.type.startsWith('image/')) { alert('Please choose an image or GIF file'); return; }
     if (file.size > MAX_IMAGE_BYTES) { alert('Image must be under 2MB'); return; }
-    const reader = new FileReader();
-    reader.onload = () => {
-      selectedMediaFile = { name: file.name, size: file.size, dataUrl: reader.result };
-      const preview = document.getElementById('mediaPreview');
-      if (!preview) return;
+
+    // Same pattern as onAudioFileSelected: upload straight to Supabase Storage
+    // now and keep only the resulting public URL — a base64 dataUrl was being
+    // stored instead, which never actually got uploaded anywhere, so the
+    // [IMAGE]...|MEDIA:<url> tag never had a real URL and the alert overlay
+    // had nothing to show.
+    selectedMediaFile = { name: file.name, size: file.size, url: null, uploading: true };
+
+    const preview  = document.getElementById('mediaPreview');
+    const statusEl = document.getElementById('mediaUploadStatus');
+    const submitBtn = document.getElementById('submitBtn');
+    const localUrl = URL.createObjectURL(file);
+
+    if (preview) {
       preview.style.display = 'flex';
       preview.innerHTML = `
-        <img src="${reader.result}" alt="">
+        <img src="${localUrl}" alt="">
         <div class="file-preview-info">
           <div class="file-preview-name">${escapeHtmlLocal(file.name)}</div>
           <div class="file-preview-size">${(file.size/1024).toFixed(0)} KB</div>
         </div>
         <button type="button" class="file-preview-remove" id="mediaRemoveBtn"><i class="ti ti-x"></i></button>`;
       document.getElementById('mediaRemoveBtn').addEventListener('click', clearMediaFile);
-    };
-    reader.readAsDataURL(file);
+    }
+
+    if (statusEl) { statusEl.style.display = 'block'; statusEl.className = 'upload-status'; statusEl.textContent = 'Uploading…'; }
+    if (submitBtn) submitBtn.disabled = true;
+
+    try {
+      const signRes = await fetch('/api/media-upload-url', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ kind: 'image', fileName: file.name, fileType: file.type, fileSize: file.size }),
+      });
+      const signData = await signRes.json();
+      if (!signRes.ok) throw new Error(signData.error || 'Could not get an upload URL');
+
+      const putRes = await fetch(signData.uploadUrl, {
+        method: 'PUT',
+        headers: { 'Content-Type': file.type || 'application/octet-stream' },
+        body: file,
+      });
+      if (!putRes.ok) throw new Error('Upload to storage failed (' + putRes.status + ')');
+
+      selectedMediaFile.url = signData.publicUrl;
+      selectedMediaFile.uploading = false;
+      if (statusEl) { statusEl.className = 'upload-status ok'; statusEl.textContent = '✓ Uploaded — ready to send'; }
+
+    } catch (err) {
+      selectedMediaFile.uploading = false;
+      selectedMediaFile.url = null;
+      if (statusEl) { statusEl.className = 'upload-status error'; statusEl.textContent = 'Upload failed — ' + err.message; }
+    } finally {
+      if (submitBtn) submitBtn.disabled = false;
+      refitCurrentContent();
+    }
   }
 
   async function onAudioFileSelected(file){
@@ -797,8 +838,11 @@ body{
     selectedMediaFile = null;
     const preview = document.getElementById('mediaPreview');
     const input = document.getElementById('mediaFileInput');
+    const statusEl = document.getElementById('mediaUploadStatus');
     if (preview) { preview.style.display = 'none'; preview.innerHTML = ''; }
     if (input) input.value = '';
+    if (statusEl) { statusEl.style.display = 'none'; statusEl.textContent = ''; }
+    refitCurrentContent();
   }
 
   function clearAudioFile(){
@@ -829,6 +873,12 @@ body{
     if (selectedType === 'audio' && selectedAudioFile && !selectedAudioFile.url) {
       alert('Voice clip upload failed — please re-record or remove it before submitting.'); return;
     }
+    if (selectedType === 'media' && selectedMediaFile && selectedMediaFile.uploading) {
+      alert('Your image is still uploading — please wait a moment.'); return;
+    }
+    if (selectedType === 'media' && selectedMediaFile && !selectedMediaFile.url) {
+      alert('Image upload failed — please re-select it or remove it before submitting.'); return;
+    }
 
     const activeType = CFG.messageTypes.find(t => t.id === selectedType);
 
@@ -840,8 +890,9 @@ body{
       currencyCode: CFG.currency.code,
       source: 'popup'
     };
-    if (selectedType === 'media' && selectedMediaFile) {
-      payload.mediaFile = { name: selectedMediaFile.name, size: selectedMediaFile.size, dataUrl: selectedMediaFile.dataUrl };
+    if (selectedType === 'media' && selectedMediaFile && selectedMediaFile.url) {
+      payload.mediaUrl = selectedMediaFile.url;
+      payload.mediaFileName = selectedMediaFile.name;
     }
     if (selectedType === 'audio' && selectedAudioFile && selectedAudioFile.url) {
       payload.audioUrl = selectedAudioFile.url;
@@ -851,9 +902,8 @@ body{
     try {
       sessionStorage.setItem('donationData', JSON.stringify(payload));
     } catch (e) {
-      // sessionStorage quota exceeded (e.g. large image) — drop the image data URL and retry
-      delete payload.mediaFile;
-      sessionStorage.setItem('donationData', JSON.stringify(payload));
+      alert('Could not save your donation details — please try again.');
+      return;
     }
 
     window.location.href = 'payment.html'; // vercel.json also rewrites /payment → payment.html
