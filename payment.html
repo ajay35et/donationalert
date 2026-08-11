@@ -192,7 +192,7 @@
     document.getElementById('r-name').textContent = state.name;
     document.getElementById('r-type').textContent = state.typeLabel || state.type || '—';
     document.getElementById('r-amt').textContent   = symbol + Math.round(state.amount);
-    document.getElementById('r-msg').textContent = (state.message || '(no message)') + (state.audioUrl ? '  🎙 voice clip attached' : '');
+    document.getElementById('r-msg').textContent = (state.message || '(no message)') + (state.audioUrl ? '  🎙 voice clip attached' : '') + (state.mediaUrl ? '  🖼️ image attached' : '');
     document.getElementById('r-email-input').value = state.email || '';
     document.getElementById('pay-amt').textContent = symbol + Math.round(state.amount);
   }
@@ -261,11 +261,16 @@
 
   // message sent to the API is prefixed with the chosen support type so it's
   // still visible on-stream even though the API itself has no "type" column.
-  // For audio, a |MEDIA:<url> suffix is appended — the StreamElements custom
-  // media overlay widget (see Readme.md §3.3) parses this to play the clip.
+  // For audio/image, a |MEDIA:<url> suffix is appended — the StreamElements
+  // custom overlay widgets (voice-alert / image-alert) call /api/latest-audio
+  // or /api/latest-image to look this up, since the tip's own `message` sent
+  // to StreamElements is kept clean (see cashfree-webhook.js).
   function outgoingMessage(){
     if (state.type === 'audio' && state.audioUrl) {
       return `[AUDIO] ${state.message || ''}`.trim() + `|MEDIA:${state.audioUrl}`;
+    }
+    if (state.type === 'media' && state.mediaUrl) {
+      return `[IMAGE] ${state.message || ''}`.trim() + `|MEDIA:${state.mediaUrl}`;
     }
     if (state.type && state.type !== 'text' && state.typeLabel) {
       return `[${state.typeLabel}] ${state.message || ''}`.trim();
