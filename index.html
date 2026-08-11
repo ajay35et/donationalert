@@ -411,9 +411,18 @@ body{
   // currently selected amount/type, the modal never changes size again as
   // the user types an amount or switches message type — and it never needs
   // to scroll, since it's already sized to fit the tallest possible content.
+  // Mobile browsers have a known bug: tapping a textarea/input that sits
+  // inside a transform:scale()'d ancestor can fail to bring up the virtual
+  // keyboard (touch hit-testing gets thrown off by the scale). Since phones
+  // are usually tall enough for our compact layout anyway, skip the scaling
+  // entirely on touch devices — only PC/laptop windows (which can be short)
+  // still get the scale-to-fit treatment.
+  const IS_TOUCH_DEVICE = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
+
   function fitModalFixedSize(){
     const modal = document.querySelector('.modal');
     if (!modal) return;
+    if (IS_TOUCH_DEVICE) { modal.style.transform = 'none'; return; }
     const wrap = document.getElementById('messageFieldWrap');
     const currentActiveType = CFG.messageTypes.find(t => t.id === selectedType);
 
@@ -444,6 +453,7 @@ body{
   function refitCurrentContent(){
     const modal = document.querySelector('.modal');
     if (!modal) return;
+    if (IS_TOUCH_DEVICE) { modal.style.transform = 'none'; return; }
     modal.style.transform = 'none';
     const available = window.innerHeight - 24;
     const natural = modal.scrollHeight;
@@ -591,11 +601,14 @@ body{
 
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      alert('DEBUG: mic access granted'); // TEMP — remove after debugging
       recordedChunks = [];
       const mimeType = MediaRecorder.isTypeSupported('audio/webm') ? 'audio/webm'
                       : MediaRecorder.isTypeSupported('audio/mp4')  ? 'audio/mp4'
                       : '';
+      alert('DEBUG: mimeType = ' + (mimeType || '(default)')); // TEMP
       mediaRecorder = mimeType ? new MediaRecorder(stream, { mimeType }) : new MediaRecorder(stream);
+      alert('DEBUG: MediaRecorder created ok'); // TEMP
 
       mediaRecorder.ondataavailable = e => { if (e.data && e.data.size > 0) recordedChunks.push(e.data); };
 
@@ -621,6 +634,7 @@ body{
       };
 
       mediaRecorder.start();
+      alert('DEBUG: recording started'); // TEMP — remove after debugging
       isRecording = true;
       recSeconds = 0;
 
