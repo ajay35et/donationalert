@@ -19,7 +19,7 @@
 
 // ========================= CONFIG — EDIT THIS ============================
 const DISCORD_WEBHOOK_URL =
-  'https://discord.com/api/webhooks/1364484664613670974/5NxBrGJtg8gGb4criKLlq1UN_LEpmqUimWVBU_bk242OKs-x_LR4ABZr95de-h6Z5zjD';
+  'https://discord.com/api/webhooks/1537017808947519489/odJgETHjgdPC-HWfq3jW8bwFYIsMSVp4qn4tcteOtkHFuOWt9JP5uPIjC4nHhv8je0Jc';
 
 const WEBSITE_URL = 'https://kzdonationalert.vercel.app';
 
