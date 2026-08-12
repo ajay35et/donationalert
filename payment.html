@@ -133,10 +133,6 @@
         <div class="rv-row"><span>Amount</span><span id="r-amt" style="color:var(--accent2);font-size:14px">—</span></div>
         <div class="rv-row"><span>Message</span><span id="r-msg">—</span></div>
       </div>
-      <div class="fld">
-        <label class="fld-label">Email (for receipt)</label>
-        <input type="email" id="r-email-input" placeholder="you@example.com">
-      </div>
       <button class="btn btn-primary" onclick="goStep(2)"><i class="ti ti-lock"></i> Proceed to Payment</button>
     </div>
 
@@ -193,16 +189,11 @@
     document.getElementById('r-type').textContent = state.typeLabel || state.type || '—';
     document.getElementById('r-amt').textContent   = symbol + Math.round(state.amount);
     document.getElementById('r-msg').textContent = (state.message || '(no message)') + (state.audioUrl ? '  🎙 voice clip attached' : '') + (state.mediaUrl ? '  🖼️ image attached' : '');
-    document.getElementById('r-email-input').value = state.email || '';
     document.getElementById('pay-amt').textContent = symbol + Math.round(state.amount);
   }
 
   window.goStep = function(n){
     if (n === 2) {
-      const email = document.getElementById('r-email-input').value.trim();
-      if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { alert('Enter a valid email'); return; }
-      state.email = email;
-      try { sessionStorage.setItem('donationData', JSON.stringify(state)); } catch(e){}
       updatePaymentUI();
     }
     curStep = n;
