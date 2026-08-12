@@ -6,6 +6,11 @@
  * forever — nothing else in this codebase ever removes them — so without
  * this, storage usage only grows and can eventually hit the plan's quota.
  *
+ * Also pings the `donations` table on every run — Supabase's Free plan
+ * auto-pauses a project after 7 days with no database activity, and since
+ * this cron already runs daily, a trivial read here is enough to keep the
+ * project from ever going to sleep, at zero extra infrastructure cost.
+ *
  * Secured with CRON_SECRET, same pattern as poll-payments.js. Unlike that
  * file's check, this one FAILS CLOSED: if CRON_SECRET isn't set at all,
  * the endpoint refuses every request instead of silently allowing them.
@@ -17,6 +22,21 @@ const SUPABASE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
 const RETENTION_DAYS = 7;
 const BUCKETS = ['donation-audio', 'donation-media']; // both use the same pending/ layout
 const LIST_PAGE_SIZE = 1000;
+
+async function pingDatabase() {
+  // Cheapest possible real query — just proves the DB was touched today.
+  // Storage API calls alone may not count as "database activity" for the
+  // free-tier pause timer, so this hits Postgres directly via PostgREST.
+  try {
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/donations?select=id&limit=1`, {
+      headers: { apikey: SUPABASE_KEY, Authorization: `Bearer ${SUPABASE_KEY}` },
+    });
+    return res.ok;
+  } catch (err) {
+    console.error('[cleanup-audio] keep-alive ping failed', err);
+    return false;
+  }
+}
 
 async function listAllPending(bucket) {
   const all = [];
@@ -76,6 +96,8 @@ export default async function handler(req, res) {
   const debug = req.query && req.query.debug === '1';
   const debugInfo = {};
 
+  const dbAlive = await pingDatabase();
+
   for (const bucket of BUCKETS) {
     try {
       const objects = await listAllPending(bucket);
@@ -106,8 +128,8 @@ export default async function handler(req, res) {
     }
   }
 
-  console.log('[cleanup-audio] run complete', results);
-  const response = { ok: true, retentionDays: RETENTION_DAYS, results };
+  console.log('[cleanup-audio] run complete', results, 'dbAlive:', dbAlive);
+  const response = { ok: true, retentionDays: RETENTION_DAYS, keepAlive: dbAlive, results };
   if (debug) response.debug = debugInfo;
   return res.status(200).json(response);
 }
