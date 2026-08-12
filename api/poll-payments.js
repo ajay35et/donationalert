@@ -10,6 +10,7 @@
  */
 
 import crypto from 'crypto';
+import { notifyDiscord } from './discord-notify.js';
 
 const SUPABASE_URL = process.env.SUPABASE_URL;
 const SUPABASE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
@@ -324,6 +325,13 @@ async function processDonation(donation) {
     se_fired:          se.ok,
     se_response:       se.data,
   });
+
+  notifyDiscord({
+    name:     result.name,
+    amount:   result.amount,
+    currency: result.currency,
+    message:  result.message,
+  }).catch(err => console.error('[poll] discord notify failed', err));
 }
 
 // ─── Cron handler ────────────────────────────────────────────────────────────
