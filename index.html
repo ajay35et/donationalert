@@ -293,11 +293,6 @@ body{
       </div>
 
       <div class="field">
-        <div class="field-label">EMAIL</div>
-        <input class="text-input" id="donorEmail" type="email" placeholder="you@example.com">
-      </div>
-
-      <div class="field">
         <div class="field-label" id="typeFieldLabel">MESSAGE TYPE</div>
         <div class="type-grid" id="typeGrid"></div>
         <div class="meter-wrap">
@@ -870,16 +865,24 @@ body{
     refitCurrentContent();
   }
 
+  // Backend/payment-provider fields expect an email, but the donor never
+  // types one anymore — generate a harmless unique placeholder instead.
+  // example.com is IANA-reserved specifically for this kind of use, so it
+  // passes format/domain validation on payment gateways that check it.
+  function generatePlaceholderEmail() {
+    const rand = Math.random().toString(36).slice(2, 10);
+    return `guest-${Date.now()}-${rand}@example.com`;
+  }
+
   document.getElementById('amountInput').addEventListener('input', updateAll);
 
   document.getElementById('submitBtn').addEventListener('click', () => {
     const amount = parseFloat(document.getElementById('amountInput').value) || 0;
     const name   = document.getElementById('donorName').value.trim();
-    const email  = document.getElementById('donorEmail').value.trim();
+    const email  = generatePlaceholderEmail();
     const message = (document.getElementById('messageInput')?.value || '').trim();
 
     if (!name) { alert('Please enter your name'); return; }
-    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { alert('Enter a valid email'); return; }
     if (!amount || amount < 1 || !selectedType) { alert('Please choose an amount and message type'); return; }
     if (selectedType === 'audio' && selectedAudioFile && selectedAudioFile.uploading) {
       alert('Your voice clip is still uploading — please wait a moment.'); return;
