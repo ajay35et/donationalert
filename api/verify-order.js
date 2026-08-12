@@ -6,6 +6,8 @@
  * fires StreamElements + YouTube chat on first success, saves to Supabase.
  */
 
+import { notifyDiscord } from './discord-notify.js';
+
 const SUPABASE_URL = process.env.SUPABASE_URL;
 const SUPABASE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
 const isTestMode   = process.env.PRODUCTION_MODE !== 'true';
@@ -403,6 +405,13 @@ export default async function handler(req, res) {
       se_fired:          se.ok,
       se_response:       se.data,
     });
+
+    notifyDiscord({
+      name:     result.name,
+      amount:   result.amount,
+      currency: result.currency,
+      message:  result.message,
+    }).catch(err => console.error('[verify] discord notify failed', err));
 
     return res.status(200).json({
       paid:     true,
