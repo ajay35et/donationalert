@@ -4,6 +4,7 @@ export const config = {
 };
 
 import crypto from 'crypto';
+import { notifyDiscord } from './discord-notify.js';
 
 const SUPABASE_URL = process.env.SUPABASE_URL;
 const SUPABASE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
@@ -147,6 +148,13 @@ export default async function handler(req, res) {
       se_fired:       se.ok,
       se_response:    se.data,
     });
+
+    notifyDiscord({
+      name:     result.name,
+      amount:   result.amount,
+      currency: result.currency,
+      message:  result.message,
+    }).catch(err => console.error('[cashfree-webhook] discord notify failed', err));
 
     console.log(`[cashfree-webhook] ${orderId} PAID — SE fired: ${se.ok}`);
     return res.status(200).json({ ok: true });
