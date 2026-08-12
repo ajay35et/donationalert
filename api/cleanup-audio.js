@@ -16,6 +16,8 @@
  * the endpoint refuses every request instead of silently allowing them.
  */
 
+import { notifyDiscord } from './discord-notify.js';
+
 const SUPABASE_URL = process.env.SUPABASE_URL;
 const SUPABASE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
@@ -89,6 +91,31 @@ export default async function handler(req, res) {
   }
   if (!SUPABASE_URL || !SUPABASE_KEY) {
     return res.status(500).json({ error: 'Supabase credentials not configured' });
+  }
+
+  // Piggybacked Discord test — avoids burning a 13th serverless-function
+  // slot on the Hobby plan's 12-function limit. Hit with ?testDiscord=1
+  // to send a one-off test message without running the real cleanup.
+  if (req.query && req.query.testDiscord === '1') {
+    const logs = [];
+    const originalError = console.error;
+    console.error = (...args) => { logs.push(args.map(String).join(' ')); originalError(...args); };
+    try {
+      await notifyDiscord({
+        name: 'Test User',
+        amount: 1,
+        currency: 'INR',
+        message: 'This is a test message from /api/cleanup-audio?testDiscord=1',
+      });
+    } catch (err) {
+      logs.push('Threw: ' + err.message);
+    } finally {
+      console.error = originalError;
+    }
+    return res.status(200).json({
+      note: 'Check your Discord channel now. Errors (if any) below explain why it might not have arrived.',
+      errors: logs.length ? logs : 'none — the function ran without throwing',
+    });
   }
 
   const cutoff = Date.now() - RETENTION_DAYS * 24 * 60 * 60 * 1000; // 7 din
