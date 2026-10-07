@@ -20,7 +20,7 @@
       "icon": "message-circle",
       "color": "#22d3ee",
       "colorDim": "#0e3a42",
-      "minAmount": 1,
+      "minAmount": 5,
       "loyaltyPointsPer100": 5
     },
     {
@@ -30,7 +30,7 @@
       "icon": "mic",
       "color": "#ffb020",
       "colorDim": "#4a3208",
-      "minAmount": 200,
+      "minAmount": 149,
       "loyaltyPointsPer100": 8
     },
     {
@@ -40,7 +40,7 @@
       "icon": "image",
       "color": "#a855f7",
       "colorDim": "#2f1a45",
-      "minAmount": 400,
+      "minAmount": 199,
       "loyaltyPointsPer100": 12
     }
   ],
